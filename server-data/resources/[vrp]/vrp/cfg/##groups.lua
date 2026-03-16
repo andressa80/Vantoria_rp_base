@@ -205,7 +205,7 @@ cfg.groups = {
 		"sargento.folga",
 		"sem.permissao"
 	},
-	-- Tenete
+	-- Tenente
 	["Tenente"] = {
 		_config = {
 			title = "Tenente",
@@ -325,7 +325,7 @@ cfg.groups = {
 		},
 		"policia.permissao",
 		"investigador.permissao",
- 	    "player.noclip",
+ 		"player.noclip",
 		"sem.permissao"
 	},
 	["PaisanaInvestigador"] = {
