@@ -1,46 +1,64 @@
 local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
+
 vRP = Proxy.getInterface("vRP")
 
-local userlogin = {}
+local userLogin = {}
+
 AddEventHandler("vRP:playerSpawn",function(user_id,source,first_spawn)
-	if first_spawn then
-		local data = vRP.getUData(user_id,"vRP:spawnController")
-		local sdata = json.decode(data) or 0
-		if sdata then
-			Citizen.Wait(1000)
-			processSpawnController(source,sdata,user_id)
-		end
-	end
+    if not first_spawn then return end
+
+    local data = vRP.getUData(user_id,"vRP:spawnController")
+    local status = json.decode(data) or 0
+
+    Citizen.Wait(1000)
+    processSpawnController(source,status,user_id)
 end)
 
-function processSpawnController(source,statusSent,user_id)
-	if statusSent == 2 then
-		if not userlogin[user_id] then
-			userlogin[user_id] = true
-			doSpawnPlayer(source,user_id,false)
-		else
-			doSpawnPlayer(source,user_id,true)
-		end
-	elseif statusSent == 1 or statusSent == 0 then
-		userlogin[user_id] = true
-		TriggerClientEvent("disney-character:characterCreate",source)
-	end
+function processSpawnController(source,status,user_id)
+    if status == 2 then
+
+        if not userLogin[user_id] then
+            userLogin[user_id] = true
+            spawnPlayer(source,user_id,false)
+        else
+            spawnPlayer(source,user_id,true)
+        end
+
+    else
+        userLogin[user_id] = true
+        TriggerClientEvent("disney-character:characterCreate",source)
+    end
 end
 
+
 RegisterServerEvent("disney-character:finishedCharacter")
-AddEventHandler("disney-character:finishedCharacter",function(characterNome,characterSobrenome,characterAge,currentCharacterMode)
-	local source = source
-	local user_id = vRP.getUserId(source)
-	if user_id then
-		vRP.setUData(user_id,"currentCharacterMode",json.encode(currentCharacterMode))
-		vRP.setUData(user_id,"vRP:spawnController",json.encode(2))
-		vRP.execute("vRP/update_user_first_spawn",{ user_id = user_id, firstname = characterSobrenome, name = characterNome, age = characterAge })
-		doSpawnPlayer(source,user_id,true)
-	end
+AddEventHandler("disney-character:finishedCharacter",function(nome,sobrenome,idade,characterMode)
+
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+
+    vRP.setUData(user_id,"currentCharacterMode",json.encode(characterMode))
+    vRP.setUData(user_id,"vRP:spawnController",json.encode(2))
+
+    vRP.execute("vRP/update_user_first_spawn",{
+        user_id = user_id,
+        firstname = sobrenome,
+        name = nome,
+        age = idade
+    })
+
+    spawnPlayer(source,user_id,true)
+
 end)
 
-function doSpawnPlayer(source,user_id,firstspawn)
-	TriggerClientEvent("disney-character:normalSpawn",source,firstspawn)
-	TriggerEvent("disney-barbershop:init",user_id)
+
+function spawnPlayer(source,user_id,firstSpawn)
+
+    TriggerClientEvent("disney-character:normalSpawn",source,firstSpawn)
+
+    -- inicia aparência
+    TriggerEvent("disney-barbershop:init",user_id)
+
 end
