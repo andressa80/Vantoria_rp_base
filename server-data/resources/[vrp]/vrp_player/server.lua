@@ -455,7 +455,7 @@ RegisterCommand('status',function(source,args,rawCommand)
     local paramedico = vRP.getUsersByPermission("paramedico.permissao")
 	local mec = vRP.getUsersByPermission("mecanico.permissao")
 	local staff = vRP.getUsersByPermission("polpar.permissao")
-	local user_id = vRP.getUserId(source)        
+	local user_id = vRP.getUserId(source)
 		TriggerClientEvent("Notify",source,"importante","<bold><b>Jogadores</b>: <b>"..onlinePlayers.."<br>Administração</b>: <b>"..#staff.."<br>Policiais</b>: <b>"..#policia.."<br>Paramédicos</b>: <b>"..#paramedico.."<br>Mecânicos</b> em serviço: <b>"..#mec.."</b></bold>.",9000)
 	end)
 -----------------------------------------------------------------------------------------------------------------------------------------

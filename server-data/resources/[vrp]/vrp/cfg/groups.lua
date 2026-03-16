@@ -772,7 +772,7 @@ cfg.selectors = {
 return cfg
 ------------------------------------------ PRF Policia Rodoviaria Federal
 	----------------------------------------------------------------------------
-	 --[["PRFTerceiraClasse"] = {
+	--[["PRFTerceiraClasse"] = {
 		_config = {
 			title = "PRF Terceira Classe",
 			gtype = "job"
@@ -891,11 +891,4 @@ return cfg
 					},
 					"Bennys.permissao",
 					"player.blips"
-				},
-    
-
-
-
-
-
-	----------------------------------------------
+				}]]--,
