@@ -1,10 +1,3 @@
-------------------------------------------------------------------------------------------------------
--- [ PRODUTO ADQUIRIDO EM E&G VENDAS (discord.gg/bABGBEX) ]   										--
--- [ DESENVOLVIDO POR Edu#0069 // BACK-END POR ALLSTAR BASE ]   									--
--- [ SE VOCÊ ADQUIRIU ESSE PRODUTO, VOCÊ TEM DIREITO A SUPORTE GRATUITO ]   						--
--- [ OBRIGADO PELA CONFIANÇA // CONTATO: Edu#0069 // GITHUB: https://github.com/badlandproject  ]   --
-------------------------------------------------------------------------------------------------------
-
 -- [ TUNELAGEM / VARIÁVEIS PRINCIPAIS] --
 local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
@@ -37,10 +30,10 @@ local slots = {
 	["SlotG"] = 15
 }
 
-local dropLog = "https://discordapp.com/api/webhook/yoururl"
-local sendLog = "https://discordapp.com/api/webhook/yoururl"
-local equipLog = "https://discordapp.com/api/webhook/yoururl"
-local ammoLog = "https://discordapp.com/api/webhook/yoururl"
+local dropLog = "https://discord.com/api/webhooks/1483095122123034665/RFsS0zsVGhlvqTj7LzZxGB-aK8iUv0geFGjuZivLl2YdVpu6_6SElqm-X5YyvWPciV83"
+local sendLog = "https://discord.com/api/webhooks/1483095122123034665/RFsS0zsVGhlvqTj7LzZxGB-aK8iUv0geFGjuZivLl2YdVpu6_6SElqm-X5YyvWPciV83"
+local equipLog = "https://discord.com/api/webhooks/1483095122123034665/RFsS0zsVGhlvqTj7LzZxGB-aK8iUv0geFGjuZivLl2YdVpu6_6SElqm-X5YyvWPciV83"
+local ammoLog = "https://discord.com/api/webhooks/1483095122123034665/RFsS0zsVGhlvqTj7LzZxGB-aK8iUv0geFGjuZivLl2YdVpu6_6SElqm-X5YyvWPciV83"
 
 -- [ FUNÇÃO DO WEBHOOK (EM BREVE) ] --
 function SendWebhookMessage(webhook,message)
