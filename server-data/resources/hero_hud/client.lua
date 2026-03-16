@@ -14,6 +14,7 @@ local radioDisplay = ""
 local plyInfos = {
     active = true
 }
+local hudVisible = true
 
 local vehInfos = {}
 local cfgInfos = {

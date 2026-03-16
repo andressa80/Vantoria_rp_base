@@ -15,11 +15,9 @@ cfg.groups = {
 		"player.noclip"
 			
     },
-	    ["OffDono"] = {
+		["OffDono"] = {
     	"offdono.permissao",
     	"sem.permissao"
-
-
     },
 	["Admin"] = {
 		"admin.permissao",

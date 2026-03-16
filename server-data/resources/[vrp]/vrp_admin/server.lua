@@ -730,13 +730,13 @@ local wloggroup = "https://canary.discord.com/api/webhooks/881117634287005756/LN
 RegisterCommand('group',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"dono.permissao") then
+	--if vRP.terPemissao(user_id,"dono.permissao") then
 		if args[1] and args[2] then
 			vRP.addUserGroup(parseInt(args[1]),args[2])
 			TriggerClientEvent("Notify",source,"sucesso","Voce setou o passaporte <b>"..parseInt(args[1]).."</b> no grupo <b>"..args[2].."</b>.")
 			SendWebhookMessage(wloggroup,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]: "..args[1].." \n[GRUPO]: "..args[2].." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 		end
-	end
+	--end--
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- UNGROUP

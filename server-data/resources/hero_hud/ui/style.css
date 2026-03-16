@@ -8,33 +8,23 @@ body {
     width: 100%;
     height: 100vh;
     font-family: 'Montserrat', sans-serif;
-    /* background: url(images/bg.png);
-    background: black; */
     overflow: hidden;
 
-
-    --primary-bg-color: #2F2E62;
-    /*Cor do lado esquerdo do gradient do background*/
-    --secondary-bg-color: #32315B80;
-    /*Cor do lado direito do gradient do background*/
-    --primary-icon-color: #7B4EFD;
-    /*Cor do lado esquerdo do gradiente do icone*/
-    --secondary-icon-color: #32315B;
-    /*Cor do lado direito do gradiente do icone*/
-    --border-color: #5E5CA7;
-    /*Cor da borda*/
-    --title-color: #7B4EFD;
-    /*Cor dos titulos*/
+    /* Gradiente azul para rosa */
+    --primary-bg-color: #0066ff; /* Azul */
+    --secondary-bg-color: #ff00aa; /* Rosa */
+    --primary-icon-color: #0066ff; /* Azul */
+    --secondary-icon-color: #ff00aa; /* Rosa */
+    --border-color: #8a2be2; /* Roxo (mistura) */
+    --title-color: #0066ff; /* Azul */
     --subtitle-color: #fff;
-    /*Cor dos textos em baixo*/
-    --primary-icon-velocimeter-color: #bf467221;
-    --secundary-icon-velocimeter-color: #622E37;
-    --border-icon-velocimeter-color: #A75C6E;
+    --primary-icon-velocimeter-color: #0066ff21;
+    --secundary-icon-velocimeter-color: #ff00aa;
+    --border-icon-velocimeter-color: #8a2be2;
     --gradient-color: linear-gradient(92.17deg, var(--primary-bg-color), var(--secondary-bg-color));
     --gradient-icons: linear-gradient(154.68deg, var(--primary-icon-color) -27.66%, var(--secondary-icon-color) 115.42%);
     --gradient-icon-velocimeter: linear-gradient(100.41deg, var(--primary-icon-velocimeter-color) -1.43%, var(--secundary-icon-velocimeter-color) 100%);
 }
-
 
 .color-0 {
     color: #ffffff;
