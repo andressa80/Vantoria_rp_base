@@ -15,6 +15,7 @@ cfg.groups = {
 		"player.noclip",
 		"salario1.servico"	
     },
+
 	["Admin"] = {
 		"admin.permissao",
 		"mod.permissao",

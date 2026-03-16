@@ -1164,7 +1164,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('cv', function(source, args, rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "policia.permissao") then
+	if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "policia.permissao") or vRP.terPemissao(user_id, "medico.permissao") then
 		local nplayer = vRPclient.getNearestPlayer(source, 10)
 		if nplayer then
 			vRPclient.putInNearestVehicleAsPassenger(nplayer, 7)
@@ -1176,7 +1176,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('rv', function(source, args, rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id, "admin.permissao") or vRP.terPemissao(user_id, "polpar.permissao") then
+	if vRP.terPemissao(user_id, "admin.permissao") or vRP.terPemissao(user_id, "polpar.permissao") or vRP.terPemissao(user_id, "dono.permissao") then
 		local nplayer = vRPclient.getNearestPlayer(source, 10)
 		if nplayer then
 			vRPclient.ejectVehicle(nplayer)
