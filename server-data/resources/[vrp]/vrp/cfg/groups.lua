@@ -3,6 +3,9 @@ local cfg = {}
 cfg.groups = {
 	["Dono"] = {
 		"dono.permissao",
+		"cto.permissao",
+		"coo.permissao",
+        "spv.permissao",
 		"admin.permissao",
 		"mod.permissao",
 		"suporte.permissao",
@@ -18,7 +21,80 @@ cfg.groups = {
 		["OffDono"] = {
     	"offdono.permissao",
     	"sem.permissao"
+<<<<<<< HEAD
+=======
+    
+
+>>>>>>> 5ccb7f72021ab2a8a70691e1b4f480f35e826b27
     },
+
+
+	["CTO"] = {
+		"cto.permissao",
+		"coo.permissao",
+        "spv.permissao",
+		"admin.permissao",
+		"mod.permissao",
+		"suporte.permissao",
+		"wl.permissao",
+		"polpar.permissao",
+		"ticket.permissao",
+		"wall.permissao",
+		"prop.permissao",
+		"imune.permissao",
+		"player.noclip"
+			
+    },
+	    ["OffCTO"] = {
+    	"offcto.permissao",
+    	"sem.permissao"
+    
+
+    },
+
+	["COO"] = {
+		"coo.permissao",
+        "spv.permissao",
+		"admin.permissao",
+		"mod.permissao",
+		"suporte.permissao",
+		"wl.permissao",
+		"polpar.permissao",
+		"ticket.permissao",
+		"wall.permissao",
+		"prop.permissao",
+		"imune.permissao",
+		"player.noclip"
+			
+    },
+	    ["OffCOO"] = {
+    	"offcoo.permissao",
+    	"sem.permissao"
+    
+
+    },
+
+	["SPV"] = {
+        "spv.permissao",
+		"admin.permissao",
+		"mod.permissao",
+		"suporte.permissao",
+		"wl.permissao",
+		"polpar.permissao",
+		"ticket.permissao",
+		"wall.permissao",
+		"prop.permissao",
+		"imune.permissao",
+		"player.noclip"
+			
+    },
+	    ["OffSPV"] = {
+    	"offspn.permissao",
+    	"sem.permissao"
+    
+
+    },
+
 	["Admin"] = {
 		"admin.permissao",
 		"mod.permissao",
