@@ -21,11 +21,6 @@ cfg.groups = {
 		["OffDono"] = {
     	"offdono.permissao",
     	"sem.permissao"
-<<<<<<< HEAD
-=======
-    
-
->>>>>>> 5ccb7f72021ab2a8a70691e1b4f480f35e826b27
     },
 
 
