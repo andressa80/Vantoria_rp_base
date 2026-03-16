@@ -149,7 +149,7 @@ cfg.groups = {
 			gtype = "job"
 		},
 		"advogado.permissao",
-		"portadp.permissao"
+		"portadp.permissao",
 		"portaoab.permissao",
 		"sem.permissao"
 	},
