@@ -1,48 +1,22 @@
 local Tunnel = module("vrp","lib/Tunnel")
 local Proxy = module("vrp","lib/Proxy")
-
 vRP = Proxy.getInterface("vRP")
 
-local userLogin = {}
-
-AddEventHandler("vRP:playerSpawn",function(user_id,source,first_spawn)
-    if not first_spawn then return end
-
-    local data = vRP.getUData(user_id,"vRP:spawnController")
-    local status = json.decode(data) or 0
-
-    Citizen.Wait(1000)
-    processSpawnController(source,status,user_id)
-end)
-
-function processSpawnController(source,status,user_id)
-
-    if status == 2 then
-
-        if not userLogin[user_id] then
-            userLogin[user_id] = true
-            spawnPlayer(source,user_id,false)
-        else
-            spawnPlayer(source,user_id,true)
-        end
-
-    else
-        userLogin[user_id] = true
-        TriggerClientEvent("disney-character:characterCreate",source)
-    end
-
-end
-
-
-RegisterServerEvent("disney-character:finishedCharacter")
-AddEventHandler("disney-character:finishedCharacter",function(nome,sobrenome,idade,characterMode)
+RegisterServerEvent("disney-character:createCharacter")
+AddEventHandler("disney-character:createCharacter",function(nome,sobrenome,idade)
 
     local source = source
     local user_id = vRP.getUserId(source)
+
     if not user_id then return end
 
-    vRP.setUData(user_id,"currentCharacterMode",json.encode(characterMode))
-    vRP.setUData(user_id,"vRP:spawnController",json.encode(2))
+    if nome == nil or sobrenome == nil or idade == nil then return end
+    if nome == "" or sobrenome == "" then return end
+
+    idade = tonumber(idade)
+
+    if not idade then return end
+    if idade < 18 or idade > 90 then return end
 
     vRP.execute("vRP/update_user_first_spawn",{
         user_id = user_id,
@@ -51,15 +25,19 @@ AddEventHandler("disney-character:finishedCharacter",function(nome,sobrenome,ida
         age = idade
     })
 
-    spawnPlayer(source,user_id,true)
+    spawnPlayer(source,user_id,false)
 
 end)
 
-
 function spawnPlayer(source,user_id,firstSpawn)
 
-    TriggerClientEvent("disney-character:normalSpawn",source,firstSpawn)
+    local ped = GetPlayerPed(source)
 
-    TriggerEvent("disney-barbershop:init",user_id)
+    if ped and ped ~= 0 then
+        SetEntityCoords(ped,-1037.72,-2737.86,20.16)
+        SetEntityHeading(ped,0.0)
+    end
+
+    TriggerClientEvent("disney-character:normalSpawn",source,firstSpawn)
 
 end
