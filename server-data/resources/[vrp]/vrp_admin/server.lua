@@ -629,7 +629,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('nc',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"mod.permissao") or vRP.terPemissao(user_id,"gravar.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") or vRP.terPemissao(user_id,"gravar.permissao") then
 		vRPclient.toggleNoclip(source)
 		SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /nc" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 	end
