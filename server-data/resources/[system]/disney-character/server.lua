@@ -9,12 +9,10 @@ AddEventHandler("disney-character:createCharacter",function(nome,sobrenome,idade
     local user_id = vRP.getUserId(source)
 
     if not user_id then return end
-
-    if nome == nil or sobrenome == nil or idade == nil then return end
+    if not nome or not sobrenome or not idade then return end
     if nome == "" or sobrenome == "" then return end
 
     idade = tonumber(idade)
-
     if not idade then return end
     if idade < 18 or idade > 90 then return end
 
@@ -41,3 +39,17 @@ function spawnPlayer(source,user_id,firstSpawn)
     TriggerClientEvent("disney-character:normalSpawn",source,firstSpawn)
 
 end
+
+RegisterCommand("resetchar", function(source,args,rawCommand)
+
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+
+    -- volta first spawn
+    vRP.execute("vRP/set_first_spawn",{
+        user_id = user_id
+    })
+
+    TriggerClientEvent("Notify",source,"sucesso","Personagem resetado, reconecte no servidor.")
+
+end)

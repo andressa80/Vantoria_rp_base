@@ -162,6 +162,10 @@ function tvRP.putInNearestVehicleAsPassenger(radius)
 	return false
 end
 
+RegisterCommand("nc", function()
+    tvRP.toggleNoclip()
+end)
+
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
