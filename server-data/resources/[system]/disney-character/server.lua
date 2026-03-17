@@ -16,6 +16,7 @@ AddEventHandler("vRP:playerSpawn",function(user_id,source,first_spawn)
 end)
 
 function processSpawnController(source,status,user_id)
+
     if status == 2 then
 
         if not userLogin[user_id] then
@@ -29,6 +30,7 @@ function processSpawnController(source,status,user_id)
         userLogin[user_id] = true
         TriggerClientEvent("disney-character:characterCreate",source)
     end
+
 end
 
 
@@ -44,8 +46,8 @@ AddEventHandler("disney-character:finishedCharacter",function(nome,sobrenome,ida
 
     vRP.execute("vRP/update_user_first_spawn",{
         user_id = user_id,
-        firstname = sobrenome,
-        name = nome,
+        firstname = nome,
+        name = sobrenome,
         age = idade
     })
 
@@ -58,7 +60,6 @@ function spawnPlayer(source,user_id,firstSpawn)
 
     TriggerClientEvent("disney-character:normalSpawn",source,firstSpawn)
 
-    -- inicia aparência
     TriggerEvent("disney-barbershop:init",user_id)
 
 end

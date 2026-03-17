@@ -1,22 +1,4 @@
-fx_version 'adamant'
-game 'gta5'
-
-ui_page "character-nui/index.html"
-
-files {
-	"character-nui/index.html",
-	"character-nui/range.png",
-	"character-nui/style.css",
-	"character-nui/vue.js"
-}
-
-client_scripts {
-	"@vrp/lib/utils.lua",
-	"client.lua"
-}
-
-server_scripts {
-	"@vrp/lib/utifx_version 'cerulean'
+fx_version 'cerulean'
 game 'gta5'
 
 author 'Disney Character System'
@@ -42,6 +24,4 @@ client_scripts {
 
 server_scripts {
     'server.lua'
-}ls.lua",
-	"server.lua"
 }

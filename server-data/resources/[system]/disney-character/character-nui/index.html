@@ -337,7 +337,7 @@ const app = new Vue({
 			};
 			if (this.characterNome.trim().length < 1) return;
 			if (this.characterSobrenome.trim().length < 1) return;
-			if (this.characterAge.length < 1) return;
+			if (!this.characterAge) return;
 			if (this.characterAge < 20 || this.characterAge > 90) return;
 
 			if (checkName(this.characterNome.trim())) return;
