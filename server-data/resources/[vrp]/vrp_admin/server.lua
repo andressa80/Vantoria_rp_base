@@ -5,7 +5,7 @@ vRPclient = Tunnel.getInterface("vRP")
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEBHOOK
 -----------------------------------------------------------------------------------------------------------------------------------------
-local webhookadmin = "https://canary.discord.com/api/webhooks/879705822094057482/utzFb5JKYQd0ZOG6mbrEbwY1yR19aIlwtwHJh2_ICpp9oWamnHzILXgYNBnyrq0eSPyW"
+local webhookstaff = "https://canary.discord.com/api/webhooks/879705822094057482/utzFb5JKYQd0ZOG6mbrEbwY1yR19aIlwtwHJh2_ICpp9oWamnHzILXgYNBnyrq0eSPyW"
 local webhookfac = "https://discordapp.com/api/webhooks/814354353661149204/AMsPufsrRcOZaGb_oJlZ7gQtLCCr4YEnd3DO08yJ0PPjJd0tGN6zM0-WCVKzvP35LUhV"
 local webhookkeys = "https://discordapp.com/api/webhooks/814354353661149204/AMsPufsrRcOZaGb_oJlZ7gQtLCCr4YEnd3DO08yJ0PPjJd0tGN6zM0-WCVKzvP35LUhV"
 local webhookcds = "https://discordapp.com/api/webhooks/814354353661149204/AMsPufsrRcOZaGb_oJlZ7gQtLCCr4YEnd3DO08yJ0PPjJd0tGN6zM0-WCVKzvP35LUhV"
@@ -21,8 +21,8 @@ function SendWebhookMessage(webhook,message)
 	end
 end
 
-RegisterServerEvent("adminLogs:Armamentos")
-AddEventHandler("adminLogs:Armamentos",function(weapon)
+RegisterServerEvent("staffLogs:Armamentos")
+AddEventHandler("staffLogs:Armamentos",function(weapon)
     local source = source
     local user_id = vRP.getUserId(source)
     if user_id then
@@ -37,7 +37,7 @@ local player_customs = {}
 RegisterCommand('vroupas',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     local custom = vRPclient.getCustomization(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if player_customs[source] then
             player_customs[source] = nil
             vRPclient._removeDiv(source,"customization")
@@ -65,7 +65,7 @@ local itemlist = {
 }
 RegisterCommand('arma',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-        if vRP.hasPermission(user_id,"dono.permissao") then --// troca a permiss찾o de quem pode usar o comando // pra ter log, so copiar uma log do vrp_admin la bo inicio e subistituir por "webhookarma" e o link
+        if vRP.hasPermission(user_id,"dono.permissao") or vRP.hasPermission(user_id,"staff") then --// troca a permiss찾o de quem pode usar o comando // pra ter log, so copiar uma log do vrp_staff la bo inicio e subistituir por "webhookarma" e o link
         if args[1] then
             for k,v in pairs(itemlist) do
                 if v.arg == args[1] then
@@ -83,7 +83,7 @@ end)
 RegisterCommand('dm',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     local nplayer = vRP.getUserSource(parseInt(args[1]))
-    if vRP.hasPermission(user_id,"admin.permissao") then
+    if vRP.hasPermission(user_id,"staff.permissao") then
         if args[1] == nil then
             TriggerClientEvent("Notify",source,"negado","Necessário passar o ID após o comando, exemplo: <b>/dm 1</b>")
             return
@@ -113,7 +113,7 @@ end
 RegisterCommand('vroupas2', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
     local custom = vRPclient.getCustomization(source)
-    if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
           if player_customs[source] then
             player_customs[source] = nil
             vRPclient._removeDiv(source,"customization")
@@ -146,7 +146,7 @@ end)
 ---------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-----[Resetar Personagem  /reset "id"     (colocar no vrp_admin/server)]   
+----[Resetar Personagem  /reset "id"     (colocar no vrp_staff/server)]   
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 RegisterCommand('reset',function(source,args,rawCommand)
@@ -173,7 +173,7 @@ AddEventHandler("vRP:playerSpawn",function(user_id,source,first_spawn)
         blips[source] = { source }
        TriggerClientEvent("blips:updateBlips",-1,blips)
         if vRP.terPemissao(user_id,"blips.permissao") then
-            TriggerClientEvent("blips:adminStart",source)
+            TriggerClientEvent("blips:staffStart",source)
         end
      end
  end)
@@ -190,7 +190,7 @@ end)
 RegisterCommand('kill',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-    if vRP.terPemissao(user_id,"dono.permissao") or vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"dono.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] then
             local nplayer = vRP.getUserSource(parseInt(args[1]))
             if nplayer then
@@ -210,7 +210,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('estoque',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] and args[2] then
             vRP.execute("creative/set_estoque",{ vehicle = args[1], quantidade = args[2] })
             TriggerClientEvent("Notify",source,"sucesso","Voce colocou mais <b>"..args[2].."</b> no estoque, para o carro <b>"..args[1].."</b>.") 
@@ -251,7 +251,7 @@ RegisterCommand('remcar',function(source,args,rawCommand)
             local identitynu = vRP.getUserIdentity(nuser_id)
             vRP.execute("creative/rem_vehicle",{ user_id = parseInt(args[2]), vehicle = args[1], ipva = parseInt(os.time())  }) 
             TriggerClientEvent("Notify",source,"sucesso","Voce removeu o veículo <b>"..args[1].."</b> do Passaporte: <b>"..parseInt(args[2]).."</b>.") 
-            SendWebhookMessage(webhookadmin,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]: "..args[1].." \n[PARA O ID]: "..nuser_id.." "..identitynu.name.." "..identitynu.firstname.." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+            SendWebhookMessage(webhookstaff,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]: "..args[1].." \n[PARA O ID]: "..nuser_id.." "..identitynu.name.." "..identitynu.firstname.." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
         end
     end
 end)
@@ -260,7 +260,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('estoque',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] and args[2] then
             vRP.execute("creative/set_estoque",{ vehicle = args[1], quantidade = args[2] })
             TriggerClientEvent("Notify",source,"sucesso","Voce colocou mais <b>"..args[2].."</b> no estoque, para o veículo <b>"..args[1].."</b>.") 
@@ -273,7 +273,7 @@ end)
 RegisterCommand('uncuff',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	if user_id then
-		if vRP.terPemissao(user_id,"admin.permissao") then
+		if vRP.terPemissao(user_id,"staff.permissao") then
 			TriggerClientEvent("admcuff",source)
 			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /uncuff" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 		end
@@ -297,7 +297,7 @@ end)
 RegisterCommand('limpararea',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     local x,y,z = vRPclient.getPosition(source)
-    if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         TriggerClientEvent("syncarea",-1,x,y,z)
 		SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /limparea" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
     end
@@ -305,10 +305,10 @@ end)
 
 RegisterCommand('limparinv',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-     if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
-		vRP.clearInventory(user_id)
-		TriggerClientEvent("Notify",source,"sucesso","Você <b>limpou seu inventário</b> com sucesso!")
-		SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /limparinv" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+     	if vRP.terPemissao(user_id,"staff.permissao") then
+			vRP.clearInventory(user_id)
+			TriggerClientEvent("Notify",source,"sucesso","Você <b>limpou seu inventário</b> com sucesso!")
+			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /limparinv" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
     end
 end)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -318,7 +318,7 @@ RegisterCommand('apagao',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     if user_id ~= nil then
         local player = vRP.getUserSource(user_id)
-        if vRP.terPemissao(user_id,"admin.permissao") and args[1] ~= nil then
+        if vRP.terPemissao(user_id,"staff.permissao") and args[1] ~= nil then
             local cond = tonumber(args[1])
             --TriggerEvent("cloud:setApagao",cond)
             TriggerClientEvent("cloud:setApagao",-1,cond)     
@@ -333,7 +333,7 @@ RegisterCommand('raios', function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     if user_id ~= nil then
         local player = vRP.getUserSource(user_id)
-        if vRP.terPemissao(user_id,"admin.permissao") and args[1] ~= nil then
+        if vRP.terPemissao(user_id,"staff.permissao") and args[1] ~= nil then
             local vezes = tonumber(args[1])
             TriggerClientEvent("cloud:raios",-1,vezes)         
 			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /raios" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")  
@@ -345,7 +345,7 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('skin',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"dono.permissao") then
+    if vRP.terPemissao(user_id,"dono.permissao") or vRP.hasPermission(user_id,"staff.permissao") then
         if parseInt(args[1]) then
             local nplayer = vRP.getUserSource(parseInt(args[1]))
             if nplayer then
@@ -363,7 +363,7 @@ RegisterCommand('debug',function(source, args, rawCommand)
 	local user_id = vRP.getUserId(source)
 	if user_id ~= nil then
 		local player = vRP.getUserSource(user_id)
-		if vRP.terPemissao(user_id,"admin.permissao") then
+		if vRP.terPemissao(user_id,"staff.permissao") then
 			TriggerClientEvent("ToggleDebug",player)
 			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /debug" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 		end
@@ -376,7 +376,7 @@ RegisterCommand('gas',function(source, args, rawCommand)
 	local user_id = vRP.getUserId(source)
 	if user_id ~= nil then
 		local player = vRP.getUserSource(user_id)
-		if (vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"platina.permissao")) then
+		if (vRP.terPemissao(user_id,"staff.permissao") or vRP.terPemissao(user_id,"platina.permissao")) then
 			TriggerClientEvent("admfuel",player)
 			TriggerClientEvent("Notify",source,"sucesso","Tanque cheio")
 		end
@@ -385,9 +385,9 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DV
 -----------------------------------------------------------------------------------------------------------------------------------------
---[[  RegisterCommand('dv',function(source,args,rawCommand)
+RegisterCommand('dv',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"polpar.permissao") or vRP.terPemissao(user_id,"mecanico.permissao") or vRP.terPemissao(user_id,"conce.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") or vRP.terPemissao(user_id,"polpar.permissao") or vRP.terPemissao(user_id,"mecanico.permissao") or vRP.terPemissao(user_id,"hp.permissao") then
 		local vehicle = vRPclient.getNearestVehicle(source,7)
 		if vehicle then
 			print(vehicle)
@@ -395,7 +395,7 @@ end)
 			TriggerEvent("nation:deleteVehicleSync",vehicle)
 		end
 	end
-end)  ]]
+end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TRYDELETEVEH
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -417,7 +417,7 @@ RegisterCommand('fix',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local vehicle = vRPclient.getNearestVehicle(source,11)
 	if vehicle then
-		if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+		if vRP.terPemissao(user_id,"staff.permissao") then
 			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /fix" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			TriggerClientEvent('reparar',source)
 		end
@@ -432,7 +432,7 @@ local wloggod = "https://canary.discord.com/api/webhooks/881112520901943386/R49_
 
 RegisterCommand('god',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] then
             local nplayer = vRP.getUserSource(parseInt(args[1]))
             if nplayer then
@@ -455,7 +455,7 @@ end)
 
 RegisterCommand('cdscu',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] then
             local nplayer = vRP.getUserSource(parseInt(args[1]))
             if nplayer then
@@ -497,7 +497,7 @@ end)
 
 RegisterCommand('hash',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.hasPermission(user_id,"admin.permissao") then
+	if vRP.hasPermission(user_id,"staff.permissao") then
 		TriggerClientEvent('vehash',source)
 	end
 end)
@@ -507,7 +507,7 @@ end)
 RegisterCommand('tuning',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao")then
 		TriggerClientEvent('vehtuning',source)
 	end
 end)
@@ -517,7 +517,7 @@ end)
 RegisterCommand('wl',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
     local identity = vRP.getUserIdentity(user_id)
-    if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"wl.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         if args[1] then
             vRP.setWhitelisted(parseInt(args[1]),true)
             TriggerClientEvent("Notify",source,"sucesso","Voce aprovou o passaporte <b>"..args[1].."</b> na whitelist.")
@@ -531,7 +531,7 @@ end)
 RegisterCommand('unwl',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"mod.permissao")  then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			vRP.setWhitelisted(parseInt(args[1]),false)
 			TriggerClientEvent("Notify",source,"sucesso","Voce retirou o passaporte <b>"..args[1].."</b> da whitelist.")
@@ -545,7 +545,7 @@ end)
 RegisterCommand('kick',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			local id = vRP.getUserSource(parseInt(args[1]))
 			if id then
@@ -561,7 +561,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('kickall',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
 		SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /kickall" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
         local users = vRP.getUsers()
         for k,v in pairs(users) do
@@ -581,7 +581,7 @@ local wlogban = "https://canary.discord.com/api/webhooks/881115498312519740/5IV1
 RegisterCommand('ban',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			local id = vRP.getUserSource(parseInt(args[1]))
 			vRP.setBanned(parseInt(args[1]),true)
@@ -600,7 +600,7 @@ local wlogunban = "https://canary.discord.com/api/webhooks/881116723552600174/wt
 RegisterCommand('unban',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			vRP.setBanned(parseInt(args[1]),false)
 			TriggerClientEvent("Notify",source,"sucesso","Voce desbaniu o passaporte <b>"..args[1].."</b> da cidade.")
@@ -639,7 +639,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('tpcds',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local fcoords = vRP.prompt(source,"Cordenadas:","")
 		if fcoords == "" then
 			return
@@ -656,7 +656,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('cds',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		heading = GetEntityHeading(GetPlayerPed(-1))
 		vRP.prompt(source,"Cordenadas:","['x'] = "..tD(x)..", ['y'] = "..tD(y)..", ['z'] = "..tD(z))
@@ -665,7 +665,7 @@ end)
 
 RegisterCommand('cds2',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		vRP.prompt(source,"Cordenadas:",tD(x)..", "..tD(y)..", "..tD(z))
 	end
@@ -673,7 +673,7 @@ end)
 
 RegisterCommand('cds3',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		vRP.prompt(source,"Cordenadas:","{name='ATM', id=277, x="..tD(x)..", y="..tD(y)..", z="..tD(z).."},")
 	end
@@ -681,7 +681,7 @@ end)
 
 RegisterCommand('cds4',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		vRP.prompt(source,"Cordenadas:","x = "..tD(x)..", y = "..tD(y)..", z = "..tD(z))
 	end
@@ -696,7 +696,7 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('cdsh',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		local lugar = vRP.prompt(source,"Lugar:","")
 		if lugar == "" then
@@ -711,7 +711,7 @@ end)
 RegisterServerEvent("cds:corridas")
 AddEventHandler("cds:corridas",function()
 local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local x,y,z = vRPclient.getPosition(source)
 		SendWebhookMessage(webhookcds,"```prolog\n[] = { ['x'] = "..tD(x)..", ['y'] = "..tD(y)..", ['z'] = "..tD(z).." }, \r```")
 	end
@@ -763,7 +763,7 @@ local wlogtptome = "https://canary.discord.com/api/webhooks/881113362447085568/v
 
 RegisterCommand('tptome',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			local tplayer = vRP.getUserSource(parseInt(args[1]))
 			local x,y,z = vRPclient.getPosition(source)
@@ -782,7 +782,7 @@ local wlogtpto = "https://canary.discord.com/api/webhooks/881113186995142657/uTP
 
 RegisterCommand('tpto',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"mod.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			local tplayer = vRP.getUserSource(parseInt(args[1]))
 			if tplayer then
@@ -800,7 +800,7 @@ local wlogtpway = "https://canary.discord.com/api/webhooks/881112969478541384/rz
 
 RegisterCommand('tpway',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"suporte.permissao") or vRP.terPemissao(user_id,"mod.permissao")  then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		TriggerClientEvent('tptoway',source)
 		SendWebhookMessage(wlogtpway,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /tpway" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 	end
@@ -814,7 +814,7 @@ RegisterCommand('car',function(source,args,rawCommand)
 	if vRP.terPemissao(user_id,"dono.permissao") or vRP.terPemissao(user_id,"vendedor.permissao") then
 		if args[1] then
 			TriggerClientEvent('spawnarveiculo',source,args[1])
-			SendWebhookMessage(webhookadmin,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SPAWNOU]: "..(args[1]).." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+			SendWebhookMessage(webhookstaff,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SPAWNOU]: "..(args[1]).." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 		end
 	end
 end)
@@ -823,7 +823,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('delnpcs',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
-	if vRP.terPemissao(user_id,"admin.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		TriggerClientEvent('delnpcs',source)
 	end
 end)
@@ -833,12 +833,12 @@ end)
 RegisterCommand('adm',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"admin.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		local mensagem = vRP.prompt(source,"Mensagem:","")
 		if mensagem == "" then
 			return
 		end
-		SendWebhookMessage(webhookadmin,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[MENSAGEM]: "..mensagem.." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+		SendWebhookMessage(webhookstaff,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[MENSAGEM]: "..mensagem.." "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 		vRPclient.setDiv(-1,"anuncio",".div_anuncio { background: rgba(255,50,50,0.8); font-size: 11px; font-family: arial; color: #fff; padding: 20px; bottom: 10%; right: 5%; max-width: 500px; position: absolute; -webkit-border-radius: 5px; } bold { font-size: 16px; }","<bold>"..mensagem.."</bold><br><br>Mensagem enviada por: Administrador")
 		SetTimeout(60000,function()
 			vRPclient.removeDiv(-1,"anuncio")
@@ -850,7 +850,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('pon',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         local users = vRP.getUsers()
         local players = ""
         local quantidade = 0
@@ -874,7 +874,7 @@ end)
 RegisterCommand('addpolicia',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]: "..parseInt(args[1]).." \n[GRUPO]: ADA "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Recruta")
@@ -905,7 +905,7 @@ local waddtdt = "https://canary.discord.com/api/webhooks/881089596484628530/WE_Z
 RegisterCommand('addtdt',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDT.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDT.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddtdt,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da Turquia "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"TDT")
@@ -920,7 +920,7 @@ local wremtdt = "https://canary.discord.com/api/webhooks/881089937645117460/zVGE
 RegisterCommand('remtdt',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDT.permissao") or vRP.terPemissao(user_id,"mod.permissao")  then
+	if vRP.terPemissao(user_id,"liderTDT.permissao") or vRP.terPemissao(user_id,"staff.permissao")  then
 		if args[1] then
 			SendWebhookMessage(wremtdt,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da Turquia "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"TDT")
@@ -937,7 +937,7 @@ local waddtdb = "https://canary.discord.com/api/webhooks/881095364525035620/zdLK
 RegisterCommand('addtdb',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDB.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDB.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddtdb,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da Belgica "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"TDB")
@@ -952,7 +952,7 @@ local wremtdb = "https://canary.discord.com/api/webhooks/881095906286530590/mcRg
 RegisterCommand('remtdb',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDB.permissao") or vRP.terPemissao(user_id,"suporte.permissao") then
+	if vRP.terPemissao(user_id,"liderTDB.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremtdb,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da Belgica "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"TDB")
@@ -969,7 +969,7 @@ local waddtdj = "https://canary.discord.com/api/webhooks/881097716040605696/xvdr
 RegisterCommand('addtdj',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDJ.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDJ.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddtdj,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa do Japão "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"TDJ")
@@ -985,7 +985,7 @@ local wremtdj = "https://canary.discord.com/api/webhooks/881098026754641950/gHtJ
 RegisterCommand('remtdj',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDJ.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDJ.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremtdj,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa do Japão "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"TDJ")
@@ -1002,7 +1002,7 @@ local waddtdf = "https://canary.discord.com/api/webhooks/881099470178250762/AdF4
 RegisterCommand('addtdf',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDF.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDF.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddtdf,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da França "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"TDF")
@@ -1018,7 +1018,7 @@ local wremtdf = "https://canary.discord.com/api/webhooks/881100185013456916/NATE
 RegisterCommand('remtdf',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderTDF.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderTDF.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremtdf,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Tropa da França "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"TDF")
@@ -1035,7 +1035,7 @@ local waddmafia = "https://canary.discord.com/api/webhooks/881101261934579783/kf
 RegisterCommand('addmafia',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidermafia.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidermafia.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddmafia,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Mafia "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Mafia")
@@ -1051,7 +1051,7 @@ local wremmafia = "https://canary.discord.com/api/webhooks/881102168084607018/bk
 RegisterCommand('remmafia',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidermafia.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidermafia.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremmafia,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Mafia "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Mafia")
@@ -1068,7 +1068,7 @@ local waddcartel = "https://canary.discord.com/api/webhooks/881103239465037834/H
 RegisterCommand('addcartel',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidercartel.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidercartel.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddcartel,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Cartel "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Cartel")
@@ -1083,7 +1083,7 @@ local wremcartel = "https://canary.discord.com/api/webhooks/881103559955976214/I
 RegisterCommand('remcartel',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidercartel.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidercartel.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremcartel,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Cartel "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Cartel")
@@ -1100,7 +1100,7 @@ local waddvanilla = "https://canary.discord.com/api/webhooks/881104754317615144/
 RegisterCommand('addvanilla',function(source,args,rawCommand) 
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidervanilla.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidervanilla.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddvanilla,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Vanilla "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Vanilla")
@@ -1115,7 +1115,7 @@ local wremvanilla = "https://canary.discord.com/api/webhooks/881105082605776926/
 RegisterCommand('remvanilla',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidervanilla.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"lidervanilla.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wremvanilla,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Vanilla "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Vanilla")
@@ -1132,7 +1132,7 @@ local waddbennys = "https://canary.discord.com/api/webhooks/881106215940276224/C
 RegisterCommand('addbennys',function(source,args,rawCommand) 
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderbennys.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderbennys.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(waddbennys,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Bennys "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Bennys")
@@ -1147,7 +1147,7 @@ local wrembennys = "https://canary.discord.com/api/webhooks/881106578189713418/l
 RegisterCommand('rembennys',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"liderbennys.permissao") or vRP.terPemissao(user_id,"mod.permissao") then
+	if vRP.terPemissao(user_id,"liderbennys.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(wrembennys,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Bennys "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Bennys")
@@ -1161,7 +1161,7 @@ end)
 RegisterCommand('addtequilala',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidertequilala.permissao") then
+	if vRP.terPemissao(user_id,"lidertequilala.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Tequilala "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Tequilala")
@@ -1174,7 +1174,7 @@ end)
 RegisterCommand('removetequilala',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidertequilala.permissao") then
+	if vRP.terPemissao(user_id,"lidertequilala.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Tequilala "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Tequilala")
@@ -1188,7 +1188,7 @@ end)
 RegisterCommand('addmerryweather',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidermerryweather.permissao") then
+	if vRP.terPemissao(user_id,"lidermerryweather.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Lifeinvader "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Merryweather")
@@ -1201,7 +1201,7 @@ end)
 RegisterCommand('removemerryweather',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"lidermerryweather.permissao") then
+	if vRP.terPemissao(user_id,"lidermerryweather.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Lifeinvader "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Merryweather")
@@ -1215,7 +1215,7 @@ end)
 RegisterCommand('addmecanico',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"mecanicolider.permissao") then
+	if vRP.terPemissao(user_id,"mecanicolider.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Mecanico "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Mecanico")
@@ -1228,7 +1228,7 @@ end)
 RegisterCommand('removemecanico',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"mecanicolider.permissao") then
+	if vRP.terPemissao(user_id,"mecanicolider.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Mecanico "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Mecanico")
@@ -1243,7 +1243,7 @@ end)
 RegisterCommand('addspeed',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"speedlider.permissao") then
+	if vRP.terPemissao(user_id,"speedlider.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[SETOU]:"..parseInt(args[1]).." \n[GRUPO]: Speed "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.addUserGroup(parseInt(args[1]),"Speed")
@@ -1256,7 +1256,7 @@ end)
 RegisterCommand('removespeed',function(source,args,rawCommand)
 	local user_id = vRP.getUserId(source)
 	local identity = vRP.getUserIdentity(user_id)
-	if vRP.terPemissao(user_id,"speedlider.permissao") then
+	if vRP.terPemissao(user_id,"speedlider.permissao") or vRP.terPemissao(user_id,"staff.permissao") then
 		if args[1] then
 			SendWebhookMessage(webhookfac,"```prolog\n[ID]: "..user_id.." "..identity.name.." "..identity.firstname.." \n[REMOVEU]:"..parseInt(args[1]).." \n[GRUPO]: Speed "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
 			vRP.removeUserGroup(parseInt(args[1]),"Speed")
@@ -1720,7 +1720,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('festinha',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"mod.permissao") or vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         local identity = vRP.getUserIdentity(user_id)
         local mensagem = vRP.prompt(source,"Mensagem:","")
         if mensagem == "" then
@@ -1761,7 +1761,7 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('carcolor',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"admin.permissao") then
+    if vRP.terPemissao(user_id,"staff.permissao") then
         local vehicle = vRPclient.getNearestVehicle(source,7)
         if vehicle then
             local rgb = vRP.prompt(source,"RGB Color(255 255 255):","")
@@ -1778,7 +1778,7 @@ end)
 ----------------
 RegisterCommand('removearmas',function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"dono.permissao") then
+    if vRP.terPemissao(user_id,"dono.permissao") or vRP.terPemissao(user_id,"staff.permissao")then
         local users = vRP.getUsers()
         for k,v in pairs(users) do
             local id = vRP.getUserSource(parseInt(k))
