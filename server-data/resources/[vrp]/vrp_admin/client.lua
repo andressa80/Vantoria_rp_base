@@ -98,20 +98,157 @@ AddEventHandler("cloud:raios", function(vezes)
     lightsCounter = lightsCounter + vezes
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
--- TROCAR SEXO
+-- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET
 -----------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent("skinmenu")
-AddEventHandler("skinmenu", function(mhash)
-    while not HasModelLoaded(mhash) do
-        RequestModel(mhash)
-        Citizen.Wait(10)
-    end
 
-    if HasModelLoaded(mhash) then
-        SetPlayerModel(PlayerId(), mhash)
-        SetModelAsNoLongerNeeded(mhash)
+-- Função genérica para aplicar modelo
+function ApplyModel(model_name)
+    local model_hash = GetHashKey(model_name)
+    
+    if IsModelInCdimage(model_hash) then
+        RequestModel(model_hash)
+        
+        local timeout = 0
+        while not HasModelLoaded(model_hash) and timeout < 100 do
+            Citizen.Wait(10)
+            timeout = timeout + 1
+        end
+        
+        if HasModelLoaded(model_hash) then
+            SetPlayerModel(PlayerId(), model_hash)
+            SetModelAsNoLongerNeeded(model_hash)
+            
+            -- Aguardar ped carregar
+            Citizen.Wait(100)
+            
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- Função para aplicar roupas e props
+function ApplyClothes(ped, roupa, props)
+    if roupa then
+        for componente, dados in pairs(roupa) do
+            SetPedComponentVariation(ped, componente, dados.id, dados.textura, 0)
+        end
+    end
+    
+    if props then
+        for slot, dados in pairs(props) do
+            SetPedPropIndex(ped, slot, dados.id, dados.textura, true)
+        end
+    end
+end
+
+-- Comando básico de skin
+RegisterNetEvent("skinmenu")
+AddEventHandler("skinmenu", function(model_name)
+    local success = ApplyModel(model_name)
+    
+    if success then
+        TriggerEvent("Notify", "sucesso", "Skin alterada com sucesso!")
+    else
+        TriggerEvent("Notify", "negado", "Modelo de skin inválido: " .. model_name)
     end
 end)
+
+-- Aplicar preset completo (modelo + roupas)
+RegisterNetEvent("skinmenu:setPreset")
+AddEventHandler("skinmenu:setPreset", function(preset)
+    local success = ApplyModel(preset.modelo)
+    
+    if success then
+        Citizen.Wait(500) -- Aguardar ped carregar completamente
+        local ped = PlayerPedId()
+        ApplyClothes(ped, preset.roupa, preset.props)
+        TriggerEvent("Notify", "sucesso", "Preset aplicado com sucesso!")
+    else
+        TriggerEvent("Notify", "negado", "Falha ao carregar o modelo do preset.")
+    end
+end)
+
+-- Transformar em animal
+RegisterNetEvent("skinmenu:setAnimal")
+AddEventHandler("skinmenu:setAnimal", function(animal_model)
+    local success = ApplyModel(animal_model)
+    
+    if success then
+        TriggerEvent("Notify", "sucesso", "Você agora é um animal!")
+    else
+        TriggerEvent("Notify", "negado", "Falha ao carregar modelo do animal.")
+    end
+end)
+
+-- Copiar skin de outro jogador
+RegisterNetEvent("skinmenu:requestPlayerSkin")
+AddEventHandler("skinmenu:requestPlayerSkin", function(target_source)
+    local ped = PlayerPedId()
+    local target_ped = GetPlayerPed(GetPlayerFromServerId(target_source))
+    
+    -- Aguardar se o ped alvo não estiver carregado
+    if not DoesEntityExist(target_ped) then
+        Citizen.Wait(500)
+        target_ped = GetPlayerPed(GetPlayerFromServerId(target_source))
+    end
+    
+    if DoesEntityExist(target_ped) then
+        -- Coletar modelo
+        local target_model = GetEntityModel(target_ped)
+        
+        -- Coletar roupas (componentes)
+        local roupas = {}
+        for i = 0, 11 do
+            local drawable, texture = GetPedDrawableVariation(target_ped, i), GetPedTextureVariation(target_ped, i)
+            roupas[i] = { id = drawable, textura = texture }
+        end
+        
+        -- Coletar props (acessórios)
+        local props = {}
+        for i = 0, 10 do
+            local drawable, texture = GetPedPropIndex(target_ped, i), GetPedPropTextureIndex(target_ped, i)
+            if drawable ~= -1 then
+                props[i] = { id = drawable, textura = texture }
+            end
+        end
+        
+        -- Aplicar no próprio jogador
+        local model_applied = ApplyModel(target_model)
+        
+        if model_applied then
+            Citizen.Wait(500)
+            local my_ped = PlayerPedId()
+            
+            -- Aplicar roupas
+            for i, dados in pairs(roupas) do
+                SetPedComponentVariation(my_ped, i, dados.id, dados.textura, 0)
+            end
+            
+            -- Aplicar props
+            for i, dados in pairs(props) do
+                SetPedPropIndex(my_ped, i, dados.id, dados.textura, true)
+            end
+            
+            TriggerEvent("Notify", "sucesso", "Skin copiada com sucesso!")
+        else
+            TriggerEvent("Notify", "negado", "Falha ao copiar modelo do jogador.")
+        end
+    else
+        TriggerEvent("Notify", "negado", "Não foi possível encontrar o jogador de referência.")
+    end
+end)
+
+-- Comando para testar (se quiser permitir que staff use no próprio console)
+RegisterCommand('mudarskin', function(source, args)
+    local user_id = vRP.getUserId(source)
+    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
+        if args[1] then
+            TriggerEvent("skinmenu", args[1])
+        end
+    end
+end, false)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DELETAR VEICULO
 -----------------------------------------------------------------------------------------------------------------------------------------

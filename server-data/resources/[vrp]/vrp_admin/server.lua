@@ -341,19 +341,199 @@ RegisterCommand('raios', function(source,args,rawCommand)
     end
 end)
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- TROCAR SEXO
+-- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand('skin',function(source,args,rawCommand)
+local webhook_registro = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7" -- Configure sua webhook
+
+-- Presets de skin (você pode adicionar mais)
+local skin_presets = {
+    -- Femininos
+    ["mp_f_freemode_01"] = {
+        modelo = "mp_f_freemode_01",
+        roupa = {
+            -- Componentes: [0=mascara, 1=cabelo, 3=maos, 4=calcas, 5=mochila, 6=sapatos, 7=acessorios, 8=camisas, 9=colete, 10=adesivos, 11=jaquetas]
+            [11] = { id = 15, textura = 0 }, -- Jaqueta padrão feminina
+            [8] = { id = 15, textura = 0 },  -- Camisa
+            [4] = { id = 14, textura = 0 },  -- Calças
+            [6] = { id = 10, textura = 0 },  -- Sapatos
+            [1] = { id = 3, textura = 0 },   -- Cabelo
+            [2] = { id = 0, textura = 0 }    -- Barba (0 para mulheres)
+        },
+        props = {} -- Acessórios vazios
+    },
+    
+    -- Masculinos
+    ["mp_m_freemode_01"] = {
+        modelo = "mp_m_freemode_01",
+        roupa = {
+            [11] = { id = 15, textura = 0 }, -- Jaqueta padrão masculina
+            [8] = { id = 15, textura = 0 },  -- Camisa
+            [4] = { id = 14, textura = 0 },  -- Calças
+            [6] = { id = 10, textura = 0 },  -- Sapatos
+            [1] = { id = 1, textura = 0 },   -- Cabelo curto
+            [2] = { id = 0, textura = 0 }    -- Barba (0 ou algum ID se quiser)
+        },
+        props = {}
+    },
+    
+    -- Policial Feminina
+    ["policial_f"] = {
+        modelo = "mp_f_freemode_01",
+        roupa = {
+            [11] = { id = 55, textura = 0 }, -- Jaqueta policial
+            [8] = { id = 55, textura = 0 },  -- Camisa policial
+            [4] = { id = 36, textura = 0 },  -- Calça policial
+            [6] = { id = 11, textura = 0 },  -- Botas
+            [1] = { id = 8, textura = 0 }    -- Cabelo preso
+        },
+        props = {
+            [0] = { id = 9, textura = 0 }     -- Chapéu
+        }
+    },
+    
+    -- Policial Masculino
+    ["policial_m"] = {
+        modelo = "mp_m_freemode_01",
+        roupa = {
+            [11] = { id = 55, textura = 0 },
+            [8] = { id = 55, textura = 0 },
+            [4] = { id = 36, textura = 0 },
+            [6] = { id = 11, textura = 0 },
+            [1] = { id = 7, textura = 0 }
+        },
+        props = {
+            [0] = { id = 9, textura = 0 }
+        }
+    },
+    
+    -- Médico
+    ["medico"] = {
+        modelo = "s_m_m_doctor_01",
+        roupa = {},
+        props = {}
+    },
+    
+    -- Praia
+    ["praia_f"] = {
+        modelo = "a_f_m_beach_01",
+        roupa = {},
+        props = {}
+    },
+    
+    ["praia_m"] = {
+        modelo = "a_m_m_beach_01",
+        roupa = {},
+        props = {}
+    }
+}
+
+-- Animais disponíveis
+local animais = {
+    ["cachorro"] = "a_c_rottweiler",
+    ["pastor"] = "a_c_shepherd",
+    ["husky"] = "a_c_husky",
+    ["pug"] = "a_c_pug",
+    ["gato"] = "a_c_cat_01",
+    ["leao"] = "a_c_lion",
+    ["tigre"] = "a_c_tiger",
+    ["urso"] = "a_c_bearblack",
+    ["coelho"] = "a_c_rabbit_01",
+    ["macaco"] = "a_c_chimp",
+    ["cavalo"] = "a_c_horse_americanstandard",
+    ["vaca"] = "a_c_cow",
+    ["galinha"] = "a_c_hen",
+    ["golfinho"] = "a_c_dolphin",
+    ["tubarao"] = "a_c_tigershark",
+    ["pato"] = "a_c_duck",
+    ["pinguim"] = "a_c_penguin"
+}
+
+RegisterCommand('skin', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id,"dono.permissao") or vRP.hasPermission(user_id,"staff.permissao") then
-        if parseInt(args[1]) then
-            local nplayer = vRP.getUserSource(parseInt(args[1]))
-            if nplayer then
-                TriggerClientEvent("skinmenu",nplayer,args[2])
-                TriggerClientEvent("Notify",source,"sucesso","Voce setou a skin <b>"..args[2].."</b> no passaporte <b>"..parseInt(args[1]).."</b>.")
-				SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /skin no usuario "..args[1].."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+    
+    -- Verificar permissão
+    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
+        
+        -- Verificar se o ID do alvo foi fornecido
+        if args[1] then
+            local target_id = parseInt(args[1])
+            local target_source = vRP.getUserSource(target_id)
+            
+            if target_source then
+                -- Se o segundo argumento for "copiar" ou "copy"
+                if args[2] and (args[2]:lower() == "copiar" or args[2]:lower() == "copy") then
+                    -- Verificar se forneceu o ID de quem copiar
+                    if args[3] then
+                        local source_id = parseInt(args[3])
+                        local source_source = vRP.getUserSource(source_id)
+                        
+                        if source_source then
+                            -- Solicitar os dados de skin do jogador fonte
+                            TriggerClientEvent("skinmenu:requestPlayerSkin", target_source, source_source)
+                            TriggerClientEvent("Notify", source, "sucesso", "Solicitada cópia da skin do passaporte <b>"..source_id.."</b> para <b>"..target_id.."</b>.")
+                        else
+                            TriggerClientEvent("Notify", source, "negado", "Jogador de referência não encontrado.")
+                        end
+                    else
+                        TriggerClientEvent("Notify", source, "negado", "Uso: /skin [alvo] copiar [passaporte_origem]")
+                    end
+                    
+                -- Verificar se é um animal
+                elseif args[2] and animais[args[2]:lower()] then
+                    local animal_model = animais[args[2]:lower()]
+                    TriggerClientEvent("skinmenu:setAnimal", target_source, animal_model)
+                    TriggerClientEvent("Notify", source, "sucesso", "Você transformou o passaporte <b>"..target_id.."</b> em <b>"..args[2].."</b>.")
+                    
+                    -- Log
+                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Transformou o usuario "..target_id.." no animal "..args[2].."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                
+                -- Verificar se é um preset
+                elseif args[2] and skin_presets[args[2]:lower()] then
+                    local preset = skin_presets[args[2]:lower()]
+                    TriggerClientEvent("skinmenu:setPreset", target_source, preset)
+                    TriggerClientEvent("Notify", source, "sucesso", "Você aplicou o preset <b>"..args[2].."</b> no passaporte <b>"..target_id.."</b>.")
+                    
+                    -- Log
+                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Aplicou preset "..args[2].." no usuario "..target_id.."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                
+                -- Caso contrário, é um modelo direto
+                elseif args[2] then
+                    local model_name = args[2]:lower()
+                    TriggerClientEvent("skinmenu", target_source, model_name)
+                    TriggerClientEvent("Notify", source, "sucesso", "Você setou a skin <b>"..model_name.."</b> no passaporte <b>"..target_id.."</b>.")
+                    
+                    -- Log
+                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /skin no usuario "..target_id.." com a skin "..model_name.."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                else
+                    TriggerClientEvent("Notify", source, "negado", "Você precisa especificar um modelo, preset, animal ou 'copiar'.")
+                end
+            else
+                TriggerClientEvent("Notify", source, "negado", "Jogador não encontrado ou offline.")
             end
+        else
+            TriggerClientEvent("Notify", source, "negado", "Uso correto: /skin [passaporte] [modelo/preset/animal/copiar] [passaporte_origem]")
         end
+    else
+        TriggerClientEvent("Notify", source, "negado", "Você não tem permissão para usar este comando.")
+    end
+end)
+
+-- Comando para listar presets e animais
+RegisterCommand('skinlist', function(source, args, rawCommand)
+    local user_id = vRP.getUserId(source)
+    
+    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
+        local msg = "===== PRESETS DISPONÍVEIS =====\n"
+        for nome, _ in pairs(skin_presets) do
+            msg = msg .. "  • " .. nome .. "\n"
+        end
+        
+        msg = msg .. "\n===== ANIMAIS DISPONÍVEIS =====\n"
+        for nome, modelo in pairs(animais) do
+            msg = msg .. "  • " .. nome .. " (" .. modelo .. ")\n"
+        end
+        
+        TriggerClientEvent("Notify", source, "importante", msg)
     end
 end)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
