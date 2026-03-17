@@ -117,7 +117,7 @@ RegisterCommand('vroupas2', function(source, args, rawCommand)
           if player_customs[source] then
             player_customs[source] = nil
             vRPclient._removeDiv(source,"customization")
-        else 
+        else
             local content = ""
             for k, v in pairs(custom) do
                 if (IsNumber(k) and k <= 11) or k == "p0" or k == "p1" or k == "p2" or k == "p6" or k == "p7" then
