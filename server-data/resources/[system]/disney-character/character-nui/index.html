@@ -1,9 +1,17 @@
-﻿<html>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="style.css">
-	<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
-	<script src="vue.js"></script>
-	<body>
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="style.css">
+
+<script src="nui://game/ui/jquery.js"></script>
+<script src="vue.js"></script>
+
+</head>
+
+<body>
 		<div class="b1" id="app" v-show="CharacterMode">
 			<div class="b1-title">Criação de Personagem</div>
 			<div class="fm-b">
@@ -489,7 +497,9 @@ const app3 = new Vue({
 				sundamageModel: this.sundamageModel,
 				frecklesModel: this.frecklesModel,
 				makeupModel: this.makeupModel,
-				makeupColor: this.makeupColor,
+				frecklesModel: -1,
+				makeupModel: -1,
+				makeupColor: 0,
 			};
 			$.post('http://disney-character/UpdateHeadOptions', JSON.stringify(arr));
 		},	
@@ -528,3 +538,5 @@ window.addEventListener('message',function(event){
 });
 
 </script>
+</body>
+</html>
