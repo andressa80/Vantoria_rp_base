@@ -23,7 +23,7 @@
   font-size: 30px;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   background: rgb(112, 5, 199);
-  background: linear-gradient(45deg,  rgb(230, 8, 175) 0%,rgb(204, 31, 190) 30%,rgb(204, 65, 158) 32%,rgb(214, 29, 199) 70%,rgb(243, 50, 195) 72%,rgb(243, 50, 227) 88%,rrgb(243, 50, 211)90%,rgb(243, 50, 169) 100%); 
+  background: linear-gradient(45deg,  rgb(230, 8, 175) 0%,rgb(204, 31, 190) 30%,rgb(204, 65, 158) 32%,rgb(214, 29, 199) 70%,rgb(243, 50, 195) 72%,rgb(243, 50, 227) 88%,rgb(243, 50, 211)90%,rgb(243, 50, 169) 100%); 
 
   color: white;
   padding: 3vh 0;
