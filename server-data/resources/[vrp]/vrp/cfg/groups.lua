@@ -458,113 +458,176 @@ cfg.groups = {
 	
 	
 	----------------------------------------------------
-	-- Hospital ------------------------------------
-	-----------------------------------------------------
+-- Hospital ----------------------------------------
+----------------------------------------------------
 
-		["ResidenteHP"] = {
-		_config = {
-			title = "Residente HP",
-			gtype = "job"
-		},
-		"hp.permissão",
-		"residentehp.permissao",
-		"paramedico.permissao",
-		"player.noclip",
-		"player.blips"
-	}, 
-	["PaisanaResidenteHP"] = {
-		_config = {
-			title = "Residente HP Folga",
-			gtype = "job"
-		},
-		"paisanaenresidente.permissao",
-		"sem.permissao"	,	
-		"player.blips"
+-- 🟠 COORDENAÇÃO
+
+["CoordGeralHP"] = {
+	_config = {
+		title = "Coordenador Geral HP",
+		gtype = "job"
 	},
-	["MedicoHP"] = {
-		_config = {
-			title = "Medico HP",
-			gtype = "job"
-		},
-		"hp.permissão",
-		"medicohp.permissao",
-		"paramedico.permissao",
-		"player.noclip",
-		"player.blips"
+	"hp.permissao",
+	"coordgeralhp.permissao",
+	"paramedico.permissao"
+},
+
+["CoordAuxHP"] = {
+	_config = {
+		title = "Coordenador Auxiliar HP",
+		gtype = "job"
 	},
-	["PaisanaMedicoHP"] = {
-		_config = {
-			title = "Medico HP Folga",
-			gtype = "job"
-		},
-		"paisanamedicohp.permissao",
-		"sem.permissao",
-		"player.blips"
-	}, 
-	
-	["AuxDiretoriaHP"] = {
-		_config = {
-			title = "Aux da Diretoria HP",
-			gtype = "job"
-		},
-		"hp.permissão",
-		"diretoria.permissao",
-		"paramedico.permissao",
-		"player.noclip",
-		"player.blips"
-	},
-	["PaisanaAuxDiretoriaHP"] = {
-		_config = {
-			title = "Aux da Diretoria HP Folga",
-			gtype = "job"
-		},
-		"paisanadiretoriahp.permissao",
-		"sem.permissao",
-		"player.blips"
-	},
+	"hp.permissao",
+	"coordauxhp.permissao",
+	"paramedico.permissao"
+},
 
 
-	["ViceDiretorHP"] = {
-		_config = {
-			title = "Vice Diretor HP",
-			gtype = "job"
-		},
-		"hp.permissão",
-		"diretoria.permissao",
-		"player.noclip",
-		"paramedico.permissao",
-		"player.blips"
-	}, 
-	["PaisanaViceDiretorHP"] = {
-		_config = {
-			title = "Vice Diretor HP folga",
-			gtype = "job"
-		},
-		"paisanadiretoriahp.permissao",
-		"sem.permissao",
-		"player.blips"
-	}, 
+-- 🔴 ALTA DIRETORIA
 
-	["DiretorHP"] = {
-		_config = {
-			title = "Diretor HP",
-			gtype = "job"
-		},
-		"hp.permissão",
-		"diretoria.permissao",
-		"paramedico.permissao",
-		"player.noclip",
-		"player.blips"
+["DiretorHP"] = {
+	_config = {
+		title = "Diretor HP",
+		gtype = "job"
 	},
-	["PaisanaDiretorHP"] = {
-		_config = {
-			title = "Diretor HP Folga",
-			gtype = "job"
-		},
-		"paisanadiretoriahp.permissao",
-		"sem.permissao",
-		"player.blips"
+	"hp.permissao",
+	"diretorhp.permissao",
+	"paramedico.permissao"
+},
+
+["ViceDiretorHP"] = {
+	_config = {
+		title = "Vice Diretor HP",
+		gtype = "job"
 	},
+	"hp.permissao",
+	"vicediretorhp.permissao",
+	"paramedico.permissao"
+},
+
+["AuxDiretorHP"] = {
+	_config = {
+		title = "Aux Diretor HP",
+		gtype = "job"
+	},
+	"hp.permissao",
+	"auxdiretorhp.permissao",
+	"paramedico.permissao"
+},
+
+
+
+-- 🟡 ÁREA MÉDICA
+
+["MedicoHP"] = {
+	_config = {
+		title = "Medico HP",
+		gtype = "job"
+	},
+	"hp.permissao",
+	"medicohp.permissao",
+	"paramedico.permissao"
+},
+
+["ResidenteHP"] = {
+	_config = {
+		title = "Residente HP",
+		gtype = "job"
+	},
+	"hp.permissao",
+	"residentehp.permissao",
+	"paramedico.permissao"
+},
+
+["EnfermeiroHP"] = {
+	_config = {
+		title = "Enfermeiro HP",
+		gtype = "job"
+	},
+	"hp.permissao",
+	"enfermeirohp.permissao",
+	"paramedico.permissao"
+},
+
+-- ⚫ PAISANA (fora de serviço)
+["PaisanaCoordGeralHP"] = {
+	_config = {
+		title = "Coordenador Geral HP Folga",
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanacoordgeralhp.permissao",
+	"sem.permissao"
+},
+
+["PaisanaCoordAuxHP"] = {
+	_config = {
+		title = "Coordenador Auxiliar HP Folga",
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanacoordauxhp.permissao",
+	"sem.permissao"
+},
+
+["Paisanadiretorhp"] = {
+	_config = {
+		title = "Diretor HP Folga",
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanadiretorhp.permissao",
+	"sem.permissao"
+},
+
+["PaisanaViceDiretorHP"] = {	
+	_config = {
+		title = "Vice Diretor HP Folga",
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanavicediretorhp.permissao",
+	"sem.permissao"
+},
+
+["PaisanaAuxDiretorHP"] = {
+	_config = {
+		title = "Aux Diretor HP Folga",			
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanaauxdiretorhp.permissao",
+	"sem.permissao"
+},
+["PaisanaMedicoHP"] = {
+	_config = {
+		title = "Medico HP Folga",
+		gtype = "job"	
+	},
+	"paisanahp.permissao",
+	"paisanamedicohp.permissao",
+	"sem.permissao"		
+},
+["PaisanaResidenteHP"] = {
+	_config = {
+		title = "Residente HP Folga",	
+		gtype = "job"
+	},
+	"paisanahp.permissao",
+	"paisanaresidentehp.permissao",
+	"sem.permissao"		
+},
+["PaisanaEnfermeiroHP"] = {
+	_config = {
+		title = "Enfermeiro HP Folga",
+		gtype = "job"
+	},			
+	"paisanahp.permissao",
+	"paisanaenfermeirohp.permissao",	
+	"sem.permissao"
+},
+
 
 	------------------------------------------------------------------------------------------
 	----------------- Mecânica  --------------------------------------------------------
