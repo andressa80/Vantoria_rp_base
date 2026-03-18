@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS `mdt_dinastia_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `oficial_id` int(11) NOT NULL,
+  `criminoso_id` int(11) NOT NULL,
+  `tipo` varchar(50) NOT NULL, -- 'PRISAO', 'MULTA', 'APREENSAO'
+  `valor` int(11) DEFAULT 0,
+  `motivo` text DEFAULT NULL,
+  `data` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `vrp_user_identities` ADD COLUMN IF NOT EXISTS `prisao` int(11) DEFAULT 0;
+
+ALTER TABLE `vrp_user_identities` ADD COLUMN IF NOT EXISTS `foto_perfil` VARCHAR(255) DEFAULT 'https://i.imgur.com/8K6h0eX.png';

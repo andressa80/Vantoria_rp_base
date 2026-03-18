@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Arial'; display: none; justify-content: center; align-items: center; height: 100vh; background: rgba(0,0,0,0.8); color: white; }
+        .panel { width: 900px; height: 600px; background: #0a1120; border: 2px solid #c5a059; display: flex; border-radius: 10px; overflow: hidden; }
+        .sidebar { width: 200px; background: #050a14; padding: 20px; border-right: 1px solid #c5a059; }
+        .content { flex: 1; padding: 30px; }
+        .gold-btn { background: #c5a059; color: black; border: none; padding: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        .maca-btn { background: #1a2a4a; color: white; border: 1px solid #c5a059; padding: 20px; margin: 10px; cursor: pointer; border-radius: 5px; }
+        h1 { color: #c5a059; border-bottom: 1px solid #c5a059; padding-bottom: 10px; }
+        input { width: 90%; padding: 10px; margin-bottom: 10px; background: #1a2a4a; border: 1px solid #c5a059; color: white; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <div class="sidebar">
+            <h2 style="color:#c5a059">DINASTIA</h2>
+            <button class="gold-btn" onclick="setTab('dash')">DASHBOARD</button>
+            <button class="gold-btn" onclick="setTab('med')">ATENDIMENTO</button>
+            <button class="gold-btn" onclick="setTab('venda')">FARMÁCIA</button>
+            <button id="duty-btn" class="gold-btn" style="background:green" onclick="toggleDuty()">ENTRAR TRABALHO</button>
+        </div>
+        <div class="content" id="tab-dash">
+            <h1>Dashboard</h1>
+            <p>Seja bem-vindo ao Hospital Dinastia.</p>
+            <div id="ranking">Ranking de Trabalho: Carregando...</div>
+        </div>
+        <div class="content" id="tab-med" style="display:none">
+            <h1>Atendimento</h1>
+            <input id="p-id" placeholder="ID do Paciente">
+            <input id="p-motivo" placeholder="Motivo">
+            <button class="gold-btn" onclick="applyVaccine()">DAR VACINA</button>
+            <hr>
+            <h3>Auto-Atendimento (Se sem médicos)</h3>
+            <button class="maca-btn" onclick="startTreatment('pago')">R$ 20.000 (1 Minuto)</button>
+            <button class="maca-btn" onclick="startTreatment('gratis')">GRÁTIS (5 Minutos)</button>
+        </div>
+        <div class="content" id="tab-venda" style="display:none">
+            <h1>Farmácia</h1>
+            <input id="v-id" placeholder="ID Comprador">
+            <input id="v-qtd" placeholder="Quantidade">
+            <input id="v-val" placeholder="Valor Total">
+            <button class="gold-btn" onclick="sellItem()">VENDER BANDAGEM</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let duty = false;
+        window.addEventListener('message', (e) => { if(e.data.action === "open") $("body").fadeIn(); });
+
+        function setTab(tab) {
+            $(".content").hide();
+            $("#tab-"+tab).show();
+        }
+
+        function toggleDuty() {
+            duty = !duty;
+            $("#duty-btn").text(duty ? "SAIR TRABALHO" : "ENTRAR TRABALHO").css("background", duty ? "red" : "green");
+            $.post('https://hospital_dinastia/toggleDuty', JSON.stringify({ status: duty }));
+        }
+
+        function startTreatment(type) { $.post('https://hospital_dinastia/requestTreatment', JSON.stringify({ type: type })); }
+        function applyVaccine() { $.post('https://hospital_dinastia/applyVaccine', JSON.stringify({ id: $("#p-id").val() })); }
+        function sellItem() { 
+            $.post('https://hospital_dinastia/sellItem', JSON.stringify({ 
+                id: $("#v-id").val(), 
+                qtd: $("#v-qtd").val(), 
+                val: $("#v-val").val() 
+            })); 
+        }
+
+        document.onkeyup = function(data) { if (data.which == 27) { $.post('https://hospital_dinastia/close'); $("body").fadeOut(); } };
+    </script>
+</body>
+</html>

@@ -539,3 +539,15 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- Criar tabela do hospital
+CREATE TABLE IF NOT EXISTS hospital_dinastia (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    hospital_bank INT DEFAULT 0
+);
+
+-- Inserir registro inicial
+INSERT INTO hospital_dinastia (id, hospital_bank) VALUES (1, 0) ON DUPLICATE KEY UPDATE id=1;
+
+-- Adicionar coluna vacinas na tabela de identidades
+ALTER TABLE vrp_user_identities ADD COLUMN IF NOT EXISTS vacinas INT DEFAULT 0;
