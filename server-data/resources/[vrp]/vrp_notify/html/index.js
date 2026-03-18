@@ -1,11 +1,63 @@
-$(document).ready(function(){
-    window.addEventListener("message",function(event){
-        var html = "<div class='animation animate__animated'><div class='notification'><p class='text-now animate__animated animate__fadeInRight animate__delay-2s'></p><p class='theme-text animate__animated animate__fadeInLeft animate__delay-2s "+event.data.css+"' >"+event.data.css+"</p><div class='animate__delay-3s animate__animated animate__heartBeat icon "+event.data.css+"'></div><p class='mensage "+event.data.css+"'>" +event.data.mensagem+ "</p></div></div>"
-		$(html).appendTo(".container").hide().show().addClass('animate__fadeIn').delay(8000).queue(function(next) {
-                    $( this ).removeClass('animate__fadeIn').addClass('animate__fadeOut').delay(1000);
-                    next();
-                }).delay(500).queue(function( next ) {
-                    $( this ).fadeOut(3000).hide().empty();
-                })
-    });
+let notifyQueue = [];
+let isShowing = false;
+let lastMessage = "";
+
+window.addEventListener("message", function(event){
+    let data = event.data;
+
+    if (!data.mensagem) return;
+
+    // anti spam
+    if (data.mensagem === lastMessage) return;
+    lastMessage = data.mensagem;
+
+    notifyQueue.push(data);
+    processQueue();
 });
+
+function processQueue() {
+    if (isShowing || notifyQueue.length === 0) return;
+
+    isShowing = true;
+    let data = notifyQueue.shift();
+
+    showNotify(data);
+}
+
+function showNotify(data) {
+
+    // 🔊 SOM
+    let sound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+    sound.volume = 0.2;
+    sound.play();
+
+    let html = `
+    <div class='notify animate__animated'>
+        <div class='notification ${data.css}'>
+            <div class='icon'></div>
+            <div class='content'>
+                <p class='title'>${data.css.toUpperCase()}</p>
+                <p class='message'>${data.mensagem}</p>
+            </div>
+        </div>
+    </div>
+    `;
+
+    let element = $(html);
+    $("#containera").append(element);
+
+    element.addClass('animate__fadeInRight');
+
+    let tempo = data.time || 5000;
+
+    setTimeout(() => {
+        element.removeClass('animate__fadeInRight').addClass('animate__fadeOutRight');
+
+        setTimeout(() => {
+            element.remove();
+            isShowing = false;
+            processQueue();
+        }, 500);
+
+    }, tempo);
+}

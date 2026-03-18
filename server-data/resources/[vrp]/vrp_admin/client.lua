@@ -79,7 +79,7 @@ AddEventHandler("cloud:setApagao", function(cond)
     SetBlackout(status)
 end)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- RAIOS (APENAS dono.permissao E staff.permissao)
+-- RAIOS (APENAS dono.permissao 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local webhookraios = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7"
 
