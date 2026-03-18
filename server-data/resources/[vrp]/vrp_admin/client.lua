@@ -78,31 +78,71 @@ AddEventHandler("cloud:setApagao", function(cond)
     end
     SetBlackout(status)
 end)
------------------------------------------------------------------------------------------------------------------------------------------
--- RAIOS
------------------------------------------------------------------------------------------------------------------------------------------
-local lightsCounter = 0
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(1000)
-        if lightsCounter > 0 then
-            lightsCounter = lightsCounter - 1
-            CreateLightningThunder()
-            Citizen.Wait(2000)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- RAIOS (APENAS dono.permissao E staff.permissao)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local webhookraios = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7"
+
+RegisterCommand('raios', function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id ~= nil then
+        -- Verifica APENAS dono.permissao OU staff.permissao
+        if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "staff.permissao") then
+            
+            -- Define quantidade de raios (padrão 5)
+            local vezes = 5
+            if args[1] ~= nil and tonumber(args[1]) then
+                vezes = tonumber(args[1])
+                if vezes > 20 then vezes = 20 end
+                if vezes < 1 then vezes = 1 end
+            end
+            
+            -- Ativa os raios
+            TriggerClientEvent("cloud:raios", -1, vezes)
+            
+            -- Pega o nome do usuário
+            local identity = vRP.getUserIdentity(user_id)
+            local nome = "Desconhecido"
+            if identity then
+                nome = identity.name .. " " .. (identity.firstname or "")
+            end
+            
+            -- Envia webhook com nome e ID
+            SendWebhookMessage(webhookraios, "```prolog\n[ID]: "..user_id.." | [NOME]: "..nome.." | [RAIOS]: "..vezes.." | "..os.date("%d/%m/%Y %H:%M:%S").." \r```")
+            
+            -- Notifica
+            TriggerClientEvent("Notify", source, "sucesso", "Você ativou "..vezes.." raios!")
         end
     end
 end)
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET (CORRIGIDO)
+-----------------------------------------------------------------------------------------------------------------------------------------
 
-RegisterNetEvent("cloud:raios")
-AddEventHandler("cloud:raios", function(vezes)
-    lightsCounter = lightsCounter + vezes
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET
------------------------------------------------------------------------------------------------------------------------------------------
+-- Função para restaurar controles após trocar skin
+local function RestoreControls()
+    Citizen.Wait(500)
+    
+    -- Resetar controles do jogador
+    SetPlayerControl(PlayerId(), true, 0)
+    SetPlayerControl(PlayerId(), true, 256)
+    
+    -- Garantir que HUD e radar estão ativos
+    DisplayHud(true)
+    DisplayRadar(true)
+    
+    -- Habilitar interações
+    SetEveryoneIgnorePlayer(PlayerId(), false)
+    SetPoliceIgnorePlayer(PlayerId(), false)
+    
+    -- Garantir que o jogador pode abrir o menu
+    local ped = PlayerPedId()
+    SetPedCanPlayAmbientAnims(ped, true)
+    SetPedCanUseAutoConversationLookat(ped, true)
+end
 
 -- Função genérica para aplicar modelo
-function ApplyModel(model_name)
+function ApplyModel(model_name, isAnimal)
     local model_hash = GetHashKey(model_name)
     
     if IsModelInCdimage(model_hash) then
@@ -118,8 +158,11 @@ function ApplyModel(model_name)
             SetPlayerModel(PlayerId(), model_hash)
             SetModelAsNoLongerNeeded(model_hash)
             
-            -- Aguardar ped carregar
             Citizen.Wait(100)
+            
+            if isAnimal then
+                AdjustAnimalVisibility()
+            end
             
             return true
         end
@@ -128,10 +171,26 @@ function ApplyModel(model_name)
     return false
 end
 
+-- Função para ajustar visibilidade quando animal
+function AdjustAnimalVisibility()
+    local ped = PlayerPedId()
+    
+    SetPedDefaultComponentVariation(ped)
+    SetPedHelmet(ped, false)
+    
+    -- Ajustar câmera
+    local gameplayCam = GetFollowPedCamViewMode()
+    if gameplayCam ~= 4 then
+        SetFollowPedCamViewMode(1)
+        Citizen.Wait(50)
+        SetFollowPedCamViewMode(4)
+    end
+end
+
 -- Função para aplicar roupas e props
-function ApplyClothes(ped, roupa, props)
-    if roupa then
-        for componente, dados in pairs(roupa) do
+function ApplyClothes(ped, roupas, props)
+    if roupas then
+        for componente, dados in pairs(roupas) do
             SetPedComponentVariation(ped, componente, dados.id, dados.textura, 0)
         end
     end
@@ -143,13 +202,70 @@ function ApplyClothes(ped, roupa, props)
     end
 end
 
+-- Função melhorada para aplicar animais (com correção de invisibilidade)
+function ApplyAnimalModel(model_name)
+    local model_hash = GetHashKey(model_name)
+    
+    if IsModelInCdimage(model_hash) then
+        RequestModel(model_hash)
+        
+        local timeout = 0
+        while not HasModelLoaded(model_hash) and timeout < 100 do
+            Citizen.Wait(10)
+            timeout = timeout + 1
+        end
+        
+        if HasModelLoaded(model_hash) then
+            local ped = PlayerPedId()
+            local pos = GetEntityCoords(ped)
+            local heading = GetEntityHeading(ped)
+            
+            -- Desabilitar controles temporariamente
+            SetPlayerControl(PlayerId(), false, 0)
+            
+            -- Mudar modelo
+            SetPlayerModel(PlayerId(), model_hash)
+            SetModelAsNoLongerNeeded(model_hash)
+            
+            Citizen.Wait(500)
+            
+            -- Recriar ped na posição
+            local newPed = PlayerPedId()
+            SetEntityCoords(newPed, pos.x, pos.y, pos.z + 1.0, false, false, false, false)
+            Citizen.Wait(100)
+            SetEntityCoords(newPed, pos.x, pos.y, pos.z, false, false, false, false)
+            SetEntityHeading(newPed, heading)
+            
+            -- FORÇAR VISIBILIDADE
+            SetEntityVisible(newPed, true, false)
+            SetEntityAlpha(newPed, 255)
+            ResetEntityAlpha(newPed)
+            NetworkSetEntityInvisibleToNetwork(newPed, false)
+            
+            -- Resetar câmera
+            RenderScriptCams(false, false, 0, true, false)
+            SetFollowPedCamViewMode(4)
+            Citizen.Wait(100)
+            SetFollowPedCamViewMode(1)
+            
+            -- Reabilitar controles
+            SetPlayerControl(PlayerId(), true, 0)
+            
+            return true
+        end
+    end
+    
+    return false
+end
+
 -- Comando básico de skin
 RegisterNetEvent("skinmenu")
 AddEventHandler("skinmenu", function(model_name)
-    local success = ApplyModel(model_name)
+    local success = ApplyModel(model_name, false)
     
     if success then
         TriggerEvent("Notify", "sucesso", "Skin alterada com sucesso!")
+        RestoreControls()
     else
         TriggerEvent("Notify", "negado", "Modelo de skin inválido: " .. model_name)
     end
@@ -158,13 +274,14 @@ end)
 -- Aplicar preset completo (modelo + roupas)
 RegisterNetEvent("skinmenu:setPreset")
 AddEventHandler("skinmenu:setPreset", function(preset)
-    local success = ApplyModel(preset.modelo)
+    local success = ApplyModel(preset.modelo, false)
     
     if success then
-        Citizen.Wait(500) -- Aguardar ped carregar completamente
+        Citizen.Wait(500)
         local ped = PlayerPedId()
         ApplyClothes(ped, preset.roupa, preset.props)
         TriggerEvent("Notify", "sucesso", "Preset aplicado com sucesso!")
+        RestoreControls()
     else
         TriggerEvent("Notify", "negado", "Falha ao carregar o modelo do preset.")
     end
@@ -173,10 +290,23 @@ end)
 -- Transformar em animal
 RegisterNetEvent("skinmenu:setAnimal")
 AddEventHandler("skinmenu:setAnimal", function(animal_model)
-    local success = ApplyModel(animal_model)
+    local success = ApplyAnimalModel(animal_model)
     
     if success then
+        Citizen.Wait(300)
+        local ped = PlayerPedId()
+        
+        SetPedResetFlag(ped, 249)
+        
+        NetworkSetEntityInvisibleToNetwork(ped, false)
+        SetEntityVisible(ped, true, false)
+        SetEntityAlpha(ped, 255)
+        
         TriggerEvent("Notify", "sucesso", "Você agora é um animal!")
+        RestoreControls()
+        
+        Citizen.Wait(2000)
+        TriggerEvent("Notify", "importante", "Pressione V para trocar a visão da câmera")
     else
         TriggerEvent("Notify", "negado", "Falha ao carregar modelo do animal.")
     end
@@ -188,24 +318,20 @@ AddEventHandler("skinmenu:requestPlayerSkin", function(target_source)
     local ped = PlayerPedId()
     local target_ped = GetPlayerPed(GetPlayerFromServerId(target_source))
     
-    -- Aguardar se o ped alvo não estiver carregado
     if not DoesEntityExist(target_ped) then
         Citizen.Wait(500)
         target_ped = GetPlayerPed(GetPlayerFromServerId(target_source))
     end
     
     if DoesEntityExist(target_ped) then
-        -- Coletar modelo
         local target_model = GetEntityModel(target_ped)
         
-        -- Coletar roupas (componentes)
         local roupas = {}
         for i = 0, 11 do
             local drawable, texture = GetPedDrawableVariation(target_ped, i), GetPedTextureVariation(target_ped, i)
             roupas[i] = { id = drawable, textura = texture }
         end
         
-        -- Coletar props (acessórios)
         local props = {}
         for i = 0, 10 do
             local drawable, texture = GetPedPropIndex(target_ped, i), GetPedPropTextureIndex(target_ped, i)
@@ -214,24 +340,27 @@ AddEventHandler("skinmenu:requestPlayerSkin", function(target_source)
             end
         end
         
-        -- Aplicar no próprio jogador
-        local model_applied = ApplyModel(target_model)
+        local isAnimal = not IsPedHuman(target_ped)
+        local model_applied = ApplyModel(target_model, isAnimal)
         
         if model_applied then
             Citizen.Wait(500)
             local my_ped = PlayerPedId()
             
-            -- Aplicar roupas
-            for i, dados in pairs(roupas) do
-                SetPedComponentVariation(my_ped, i, dados.id, dados.textura, 0)
-            end
-            
-            -- Aplicar props
-            for i, dados in pairs(props) do
-                SetPedPropIndex(my_ped, i, dados.id, dados.textura, true)
+            if not isAnimal then
+                for i, dados in pairs(roupas) do
+                    SetPedComponentVariation(my_ped, i, dados.id, dados.textura, 0)
+                end
+                
+                for i, dados in pairs(props) do
+                    SetPedPropIndex(my_ped, i, dados.id, dados.textura, true)
+                end
+            else
+                AdjustAnimalVisibility()
             end
             
             TriggerEvent("Notify", "sucesso", "Skin copiada com sucesso!")
+            RestoreControls()
         else
             TriggerEvent("Notify", "negado", "Falha ao copiar modelo do jogador.")
         end
@@ -240,13 +369,42 @@ AddEventHandler("skinmenu:requestPlayerSkin", function(target_source)
     end
 end)
 
--- Comando para testar (se quiser permitir que staff use no próprio console)
-RegisterCommand('mudarskin', function(source, args)
-    local user_id = vRP.getUserId(source)
-    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
-        if args[1] then
-            TriggerEvent("skinmenu", args[1])
+-- Loop de correção para animais invisíveis
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000)
+        
+        local ped = PlayerPedId()
+        
+        -- Se for animal e estiver invisível
+        if not IsPedHuman(ped) then
+            if not IsEntityVisible(ped) or GetEntityAlpha(ped) < 255 then
+                -- Forçar visibilidade
+                SetEntityVisible(ped, true, false)
+                SetEntityAlpha(ped, 255)
+                NetworkSetEntityInvisibleToNetwork(ped, false)
+            end
         end
+    end
+end)
+
+-- Comando para corrigir invisibilidade de animal
+RegisterCommand('fixanimal', function(source, args, rawCommand)
+    local ped = PlayerPedId()
+    
+    if not IsPedHuman(ped) then
+        -- Forçar visibilidade
+        SetEntityVisible(ped, true, false)
+        SetEntityAlpha(ped, 255)
+        
+        -- Resetar câmera
+        SetFollowPedCamViewMode(1)
+        Citizen.Wait(100)
+        SetFollowPedCamViewMode(4)
+        
+        TriggerEvent("Notify", "sucesso", "Visibilidade corrigida!")
+    else
+        TriggerEvent("Notify", "aviso", "Você não é um animal.")
     end
 end, false)
 -----------------------------------------------------------------------------------------------------------------------------------------

@@ -327,51 +327,97 @@ RegisterCommand('apagao',function(source,args,rawCommand)
     end
 end)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- RAIOS
+-- RAIOS (CORRIGIDO - com dono.permissao e staff.permissao)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-RegisterCommand('raios', function(source,args,rawCommand)
+local webhookraios = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7"
+
+RegisterCommand('raios', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
-    if user_id ~= nil then
-        local player = vRP.getUserSource(user_id)
-        if vRP.terPemissao(user_id,"staff.permissao") and args[1] ~= nil then
-            local vezes = tonumber(args[1])
-            TriggerClientEvent("cloud:raios",-1,vezes)         
-			SendWebhookMessage(webhook_registro,"```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /raios" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")  
+    
+    if user_id then
+        -- Verifica apenas dono.permissao OU staff.permissao
+        if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "staff.permissao") then
+            
+            -- Define número de raios (padrão = 5 se não especificado)
+            local vezes = 5
+            if args[1] and tonumber(args[1]) then
+                vezes = tonumber(args[1])
+            end
+            
+            -- Limita para não exagerar (máximo 20 raios)
+            if vezes > 20 then
+                vezes = 20
+                TriggerClientEvent("Notify", source, "aviso", "Número de raios limitado a 20.")
+            elseif vezes < 1 then
+                vezes = 1
+            end
+            
+            -- Dispara o evento para todos os jogadores
+            TriggerClientEvent("cloud:raios", -1, vezes)
+            
+            -- Pega informações do usuário para o log
+            local identity = vRP.getUserIdentity(user_id)
+            local nome_completo = "Desconhecido"
+            if identity then
+                nome_completo = identity.name .. " " .. (identity.firstname or "")
+            end
+            
+            -- Define qual permissão o usuário tem
+            local cargo = "Staff"
+            if vRP.terPemissao(user_id, "dono.permissao") then
+                cargo = "Dono"
+            end
+            
+            -- Envia webhook com nome e ID
+            local mensagem = string.format("```prolog\n[COMANDO RAIOS]\n━━━━━━━━━━━━━━━━\n👤 RESPONSÁVEL: %s\n🆔 ID: %s\n👑 CARGO: %s\n⚡ RAIOS: %s\n📅 DATA: %s\n━━━━━━━━━━━━━━━━```",
+                nome_completo,
+                user_id,
+                cargo,
+                vezes,
+                os.date("%d/%m/%Y %H:%M:%S")
+            )
+            
+            SendWebhookMessage(webhookraios, mensagem)
+            
+            -- Notifica o staff
+            TriggerClientEvent("Notify", source, "sucesso", "Você ativou " .. vezes .. " raios na cidade!")
+            
+        else
+            TriggerClientEvent("Notify", source, "negado", "Você não tem permissão para usar este comando.")
         end
     end
 end)
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local webhook_registro = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7" -- Configure sua webhook
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- TROCAR SKIN / SEXO / ANIMAL / COPIAR PRESET (CORRIGIDO)
+-----------------------------------------------------------------------------------------------------------------------------------------
+local webhook_registro = "https://discordapp.com/api/webhooks/1483174201786630360/wE_a1UXGPKK4IR1ZiKxknsnw0AEGUaof1RETwkGk3bHn79OJcu9Zcyu4hF84t1zikzL7"
 
--- Presets de skin (você pode adicionar mais)
+-- Presets de skin
 local skin_presets = {
     -- Femininos
     ["mp_f_freemode_01"] = {
         modelo = "mp_f_freemode_01",
         roupa = {
-            -- Componentes: [0=mascara, 1=cabelo, 3=maos, 4=calcas, 5=mochila, 6=sapatos, 7=acessorios, 8=camisas, 9=colete, 10=adesivos, 11=jaquetas]
-            [11] = { id = 15, textura = 0 }, -- Jaqueta padrão feminina
-            [8] = { id = 15, textura = 0 },  -- Camisa
-            [4] = { id = 14, textura = 0 },  -- Calças
-            [6] = { id = 10, textura = 0 },  -- Sapatos
-            [1] = { id = 3, textura = 0 },   -- Cabelo
-            [2] = { id = 0, textura = 0 }    -- Barba (0 para mulheres)
+            [11] = { id = 15, textura = 0 },
+            [8] = { id = 15, textura = 0 },
+            [4] = { id = 14, textura = 0 },
+            [6] = { id = 10, textura = 0 },
+            [1] = { id = 3, textura = 0 },
+            [2] = { id = 0, textura = 0 }
         },
-        props = {} -- Acessórios vazios
+        props = {}
     },
     
     -- Masculinos
     ["mp_m_freemode_01"] = {
         modelo = "mp_m_freemode_01",
         roupa = {
-            [11] = { id = 15, textura = 0 }, -- Jaqueta padrão masculina
-            [8] = { id = 15, textura = 0 },  -- Camisa
-            [4] = { id = 14, textura = 0 },  -- Calças
-            [6] = { id = 10, textura = 0 },  -- Sapatos
-            [1] = { id = 1, textura = 0 },   -- Cabelo curto
-            [2] = { id = 0, textura = 0 }    -- Barba (0 ou algum ID se quiser)
+            [11] = { id = 15, textura = 0 },
+            [8] = { id = 15, textura = 0 },
+            [4] = { id = 14, textura = 0 },
+            [6] = { id = 10, textura = 0 },
+            [1] = { id = 1, textura = 0 },
+            [2] = { id = 0, textura = 0 }
         },
         props = {}
     },
@@ -380,14 +426,14 @@ local skin_presets = {
     ["policial_f"] = {
         modelo = "mp_f_freemode_01",
         roupa = {
-            [11] = { id = 55, textura = 0 }, -- Jaqueta policial
-            [8] = { id = 55, textura = 0 },  -- Camisa policial
-            [4] = { id = 36, textura = 0 },  -- Calça policial
-            [6] = { id = 11, textura = 0 },  -- Botas
-            [1] = { id = 8, textura = 0 }    -- Cabelo preso
+            [11] = { id = 55, textura = 0 },
+            [8] = { id = 55, textura = 0 },
+            [4] = { id = 36, textura = 0 },
+            [6] = { id = 11, textura = 0 },
+            [1] = { id = 8, textura = 0 }
         },
         props = {
-            [0] = { id = 9, textura = 0 }     -- Chapéu
+            [0] = { id = 9, textura = 0 }
         }
     },
     
@@ -427,32 +473,40 @@ local skin_presets = {
     }
 }
 
--- Animais disponíveis
+-- ANIMAIS CORRIGIDOS (apenas os que funcionam)
 local animais = {
-    ["cachorro"] = "a_c_rottweiler",
+    ["cachorro"] = "a_c_rottweiler_02",
     ["pastor"] = "a_c_shepherd",
     ["husky"] = "a_c_husky",
+	["coyote"] = "a_c_coyote",
     ["pug"] = "a_c_pug",
     ["gato"] = "a_c_cat_01",
-    ["leao"] = "a_c_lion",
-    ["tigre"] = "a_c_tiger",
-    ["urso"] = "a_c_bearblack",
     ["coelho"] = "a_c_rabbit_01",
     ["macaco"] = "a_c_chimp",
     ["cavalo"] = "a_c_horse_americanstandard",
     ["vaca"] = "a_c_cow",
     ["galinha"] = "a_c_hen",
     ["golfinho"] = "a_c_dolphin",
-    ["tubarao"] = "a_c_tigershark",
-    ["pato"] = "a_c_duck",
-    ["pinguim"] = "a_c_penguin"
+    ["lince"] = "a_c_mtlion"
+
 }
+
+-- Função para enviar webhook (se não existir no seu arquivo)
+if not SendWebhookMessage then
+    function SendWebhookMessage(webhook, message)
+        if webhook and webhook ~= "" then
+            PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
+        end
+    end
+end
 
 RegisterCommand('skin', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
     
-    -- Verificar permissão
-    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
+    if not user_id then return end
+    
+    -- Verificar permissão (dono ou staff)
+    if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "staff.permissao") then
         
         -- Verificar se o ID do alvo foi fornecido
         if args[1] then
@@ -460,17 +514,22 @@ RegisterCommand('skin', function(source, args, rawCommand)
             local target_source = vRP.getUserSource(target_id)
             
             if target_source then
-                -- Se o segundo argumento for "copiar" ou "copy"
+                -- Comando: /skin [alvo] copiar [passaporte_origem]
                 if args[2] and (args[2]:lower() == "copiar" or args[2]:lower() == "copy") then
-                    -- Verificar se forneceu o ID de quem copiar
                     if args[3] then
                         local source_id = parseInt(args[3])
                         local source_source = vRP.getUserSource(source_id)
                         
                         if source_source then
-                            -- Solicitar os dados de skin do jogador fonte
                             TriggerClientEvent("skinmenu:requestPlayerSkin", target_source, source_source)
                             TriggerClientEvent("Notify", source, "sucesso", "Solicitada cópia da skin do passaporte <b>"..source_id.."</b> para <b>"..target_id.."</b>.")
+                            
+                            -- Log
+                            local identity = vRP.getUserIdentity(user_id)
+                            if identity then
+                                local nome = identity.name .. " " .. (identity.firstname or "")
+                                SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.." | [NOME]: "..nome.." | [COMANDO]: Copiou skin de "..source_id.." para "..target_id.." | "..os.date("%d/%m/%Y %H:%M:%S").." \r```")
+                            end
                         else
                             TriggerClientEvent("Notify", source, "negado", "Jogador de referência não encontrado.")
                         end
@@ -478,32 +537,44 @@ RegisterCommand('skin', function(source, args, rawCommand)
                         TriggerClientEvent("Notify", source, "negado", "Uso: /skin [alvo] copiar [passaporte_origem]")
                     end
                     
-                -- Verificar se é um animal
+                -- Comando: /skin [alvo] [animal]
                 elseif args[2] and animais[args[2]:lower()] then
                     local animal_model = animais[args[2]:lower()]
                     TriggerClientEvent("skinmenu:setAnimal", target_source, animal_model)
                     TriggerClientEvent("Notify", source, "sucesso", "Você transformou o passaporte <b>"..target_id.."</b> em <b>"..args[2].."</b>.")
                     
                     -- Log
-                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Transformou o usuario "..target_id.." no animal "..args[2].."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                    local identity = vRP.getUserIdentity(user_id)
+                    if identity then
+                        local nome = identity.name .. " " .. (identity.firstname or "")
+                        SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.." | [NOME]: "..nome.." | [COMANDO]: Transformou "..target_id.." em "..args[2].." | "..os.date("%d/%m/%Y %H:%M:%S").." \r```")
+                    end
                 
-                -- Verificar se é um preset
+                -- Comando: /skin [alvo] [preset]
                 elseif args[2] and skin_presets[args[2]:lower()] then
                     local preset = skin_presets[args[2]:lower()]
                     TriggerClientEvent("skinmenu:setPreset", target_source, preset)
                     TriggerClientEvent("Notify", source, "sucesso", "Você aplicou o preset <b>"..args[2].."</b> no passaporte <b>"..target_id.."</b>.")
                     
                     -- Log
-                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Aplicou preset "..args[2].." no usuario "..target_id.."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                    local identity = vRP.getUserIdentity(user_id)
+                    if identity then
+                        local nome = identity.name .. " " .. (identity.firstname or "")
+                        SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.." | [NOME]: "..nome.." | [COMANDO]: Aplicou preset "..args[2].." em "..target_id.." | "..os.date("%d/%m/%Y %H:%M:%S").." \r```")
+                    end
                 
-                -- Caso contrário, é um modelo direto
+                -- Comando: /skin [alvo] [modelo_direto]
                 elseif args[2] then
                     local model_name = args[2]:lower()
                     TriggerClientEvent("skinmenu", target_source, model_name)
                     TriggerClientEvent("Notify", source, "sucesso", "Você setou a skin <b>"..model_name.."</b> no passaporte <b>"..target_id.."</b>.")
                     
                     -- Log
-                    SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.."\n[INFO]: Utilizou o comando /skin no usuario "..target_id.." com a skin "..model_name.."" ..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+                    local identity = vRP.getUserIdentity(user_id)
+                    if identity then
+                        local nome = identity.name .. " " .. (identity.firstname or "")
+                        SendWebhookMessage(webhook_registro, "```prolog\n[ID]: "..user_id.." | [NOME]: "..nome.." | [COMANDO]: Skin "..model_name.." em "..target_id.." | "..os.date("%d/%m/%Y %H:%M:%S").." \r```")
+                    end
                 else
                     TriggerClientEvent("Notify", source, "negado", "Você precisa especificar um modelo, preset, animal ou 'copiar'.")
                 end
@@ -522,7 +593,9 @@ end)
 RegisterCommand('skinlist', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
     
-    if vRP.terPemissao(user_id, "dono.permissao") or vRP.hasPermission(user_id, "staff.permissao") then
+    if not user_id then return end
+    
+    if vRP.terPemissao(user_id, "dono.permissao") or vRP.terPemissao(user_id, "staff.permissao") then
         local msg = "===== PRESETS DISPONÍVEIS =====\n"
         for nome, _ in pairs(skin_presets) do
             msg = msg .. "  • " .. nome .. "\n"
@@ -534,6 +607,17 @@ RegisterCommand('skinlist', function(source, args, rawCommand)
         end
         
         TriggerClientEvent("Notify", source, "importante", msg)
+    end
+end)
+
+RegisterNetEvent("skinmenu:fixAnimalVisibility")
+AddEventHandler("skinmenu:fixAnimalVisibility", function()
+    local source = source
+    local user_id = vRP.getUserId(source)
+    
+    if user_id then
+        Citizen.Wait(1000)
+        TriggerClientEvent("skinmenu:forceAnimalFix", source)
     end
 end)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
